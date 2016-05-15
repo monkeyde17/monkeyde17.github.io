@@ -1,0 +1,382 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- ActionInstant | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="ActionInstant瞬时动作
+比较常用的顺势动作例如：
+
+CallFunc*
+
+其他的瞬时动作不是很常用：
+
+
+
+不常用
+替代
+
+
+
+
+FlipX
+Sprite::setFlippedX
+
+
+FlipY
+Sprite::setFlippedY
+
+
+Hide
+Node::setOpacity(0">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- ActionInstant"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- ActionInstant</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-12-18</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p><code>ActionInstant</code>瞬时动作</p>
+<p>比较常用的顺势动作例如：</p>
+<ul>
+<li>CallFunc*</li>
+</ul>
+<p>其他的瞬时动作不是很常用：</p>
+<table>
+<thead>
+<tr>
+<th>不常用</th>
+<th>替代</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FlipX</td>
+<td>Sprite::setFlippedX</td>
+</tr>
+<tr>
+<td>FlipY</td>
+<td>Sprite::setFlippedY</td>
+</tr>
+<tr>
+<td>Hide</td>
+<td>Node::setOpacity(0)</td>
+</tr>
+<tr>
+<td>Show</td>
+<td>Node::setOpacity(255)</td>
+</tr>
+<tr>
+<td>Place</td>
+<td>Node::setPosition</td>
+</tr>
+<tr>
+<td>RemoveSelf</td>
+<td>Node::removeXXXXXX</td>
+</tr>
+<tr>
+<td>ToggleVisibility</td>
+<td>Node::setVisible</td>
+</tr>
+</tbody>
+</table>
+<p>看源码的实现，也是调用这些函数或者类似的一次。</p>
+<h2 id="u8DEF_u5F84"><a href="#u8DEF_u5F84" class="headerlink" title="路径"></a>路径</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2</span>d/actions/CCActionInstant.h</span><br><span class="line"><span class="number">2</span>d/actions/CCActionInstant.cpp</span><br></pre></td></tr></table></figure>
+<h2 id="u6E90_u7801"><a href="#u6E90_u7801" class="headerlink" title="源码"></a>源码</h2><h3 id="u57FA_u7C7B__u2013_ActionInstant"><a href="#u57FA_u7C7B__u2013_ActionInstant" class="headerlink" title="基类 – ActionInstant"></a>基类 – ActionInstant</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> CC_DLL ActionInstant : <span class="keyword">public</span> FiniteTimeAction <span class="comment">//&lt;NSCopying&gt;</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> ActionInstant* <span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span> override </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> ActionInstant * <span class="title">reverse</span><span class="params">()</span> <span class="keyword">const</span> override </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">isDone</span><span class="params">()</span> <span class="keyword">const</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">step</span><span class="params">(<span class="keyword">float</span> dt)</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(<span class="keyword">float</span> time)</span> override</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">bool</span> ActionInstant::isDone() <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* 直接返回 true ，表示已经完成 */</span></span><br><span class="line">    <span class="comment">/* 具体见ActionManager的实现 */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> ActionInstant::step(<span class="keyword">float</span> dt) &#123;</span><br><span class="line">    CC_UNUSED_PARAM(dt);</span><br><span class="line">    update(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> ActionInstant::update(<span class="keyword">float</span> time) &#123;</span><br><span class="line">    CC_UNUSED_PARAM(time);</span><br><span class="line">    <span class="comment">// nothing</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在以上代码中值得关注的是step函数的实现：</p>
+<ul>
+<li><code>update(1)</code>表示动作立马执行完成，具体见Action的代码。</li>
+<li>ActionInstant的子类都是重写<code>update</code>函数。</li>
+</ul>
+<p>除了CallFunc系列之外，其他的那些都比较简单。</p>
+<hr>
+<p>这里先列出所有的类</p>
+<table>
+<thead>
+<tr>
+<th>类</th>
+<th>回调类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CallFunc</td>
+<td><code>std::function&lt;void&gt;()</code>   </td>
+</tr>
+<tr>
+<td></td>
+<td><code>SEL_CallFunc</code></td>
+</tr>
+<tr>
+<td>CallFuncN</td>
+<td><code>std::function&lt;Node*&gt;()</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>SEL_CallFuncN</code></td>
+</tr>
+<tr>
+<td>*__CallFuncO</td>
+<td><code>SEL_CallFuncO</code></td>
+</tr>
+<tr>
+<td>*__CallFuncND</td>
+<td><code>SEL_CallFuncND</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>PS ：SEL_CallFunc*系列都不建议使用，还是用c++11新特性的std::function</p>
+</blockquote>
+<hr>
+<h3 id="CallFunc"><a href="#CallFunc" class="headerlink" title="CallFunc"></a>CallFunc</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">class CC_DLL CallFunc : public ActionInstant //&lt;NSCopying&gt;</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">    /* 在js和lua脚本的绑定中，参数被改变 = -= */</span><br><span class="line">    /* In lua:local create(local funcID) */</span><br><span class="line">    /* In js: var create(var func, var this, var [data]) or var create(var func) */</span><br><span class="line"></span><br><span class="line">    static CallFunc * create(const std::function&lt;void()&gt;&amp; func);</span><br><span class="line"></span><br><span class="line">    /* SEL_CallFunc, 函数指针方式，不推荐使用 */</span><br><span class="line">    /* 兼容2.x版本 */</span><br><span class="line">    CC_DEPRECATED_ATTRIBUTE static CallFunc * create(Ref* target, SEL_CallFunc selector);</span><br><span class="line"></span><br><span class="line">public:</span><br><span class="line">    /* 执行回调函数 */</span><br><span class="line">    virtual void execute();</span><br><span class="line"></span><br><span class="line">    inline Ref* getTargetCallback() &#123; return _selectorTarget; &#125;</span><br><span class="line"></span><br><span class="line">    inline void setTargetCallback(Ref* sel) &#123;</span><br><span class="line">        if (sel != _selectorTarget) &#123;</span><br><span class="line">            CC_SAFE_RETAIN(sel);</span><br><span class="line">            CC_SAFE_RELEASE(_selectorTarget);</span><br><span class="line">            _selectorTarget = sel;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    virtual void update(float time) override;</span><br><span class="line">    virtual CallFunc* reverse() const override;</span><br><span class="line">    virtual CallFunc* clone() const override;</span><br><span class="line"></span><br><span class="line">CC_CONSTRUCTOR_ACCESS:</span><br><span class="line">    CallFunc() : _selectorTarget(nullptr) , _callFunc(nullptr) , _function(nullptr) &#123; &#125;</span><br><span class="line">    virtual ~CallFunc();</span><br><span class="line"></span><br><span class="line">    /* SEL_CallFunc, 函数指针方式，不推荐使用 */</span><br><span class="line">    /* 兼容2.x版本 */</span><br><span class="line">    CC_DEPRECATED_ATTRIBUTE bool initWithTarget(Ref* target);</span><br><span class="line"></span><br><span class="line">    bool initWithFunction(const std::function&lt;void()&gt;&amp; func);</span><br><span class="line"></span><br><span class="line">protected:</span><br><span class="line">    /* 函数指针对象 */</span><br><span class="line">    Ref*   _selectorTarget;</span><br><span class="line"></span><br><span class="line">    /* 无名共用体 */</span><br><span class="line">    union &#123;</span><br><span class="line">        SEL_CallFunc    _callFunc;</span><br><span class="line">        SEL_CallFuncN    _callFuncN;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    /* 回调函数 */</span><br><span class="line">    std::function&lt;void()&gt; _function;</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    CC_DISALLOW_COPY_AND_ASSIGN(CallFunc);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>CallFunc将std::function和函数指针的方式整合到一起，做到了向2.x版本的兼容。</p>
+<h3 id="CallFuncN"><a href="#CallFuncN" class="headerlink" title="CallFuncN"></a>CallFuncN</h3><p>CallFuncN是CallFunc的子类，这也是为什么在CallFunc中的无名结构体中含有<code>SEL_CallFuncN</code>的原因。</p>
+<h3 id="CallFuncO"><a href="#CallFuncO" class="headerlink" title="__CallFuncO"></a>__CallFuncO</h3><p>其实这个就是CallFuncN的函数指针部分，写这个类的原因主要还是兼容2.x版本</p>
+<h3 id="CallFuncND"><a href="#CallFuncND" class="headerlink" title="__CallFuncND"></a>__CallFuncND</h3><p>ND表示的是Node&amp;Data，这个函数指针回调（void(Node<em>, void </em>））这个<code>void*</code>类型的参数是额外的数据指针。</p>
+<h2 id="u603B_u7ED3"><a href="#u603B_u7ED3" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>step和update的关系在此很清晰：step调用了update</li>
+<li>自定义动作的时候，需要从基类继承过来，然后重写update方法。</li>
+<li>update方法的参数从0到1，表示开始到结束，比如update(1)表示结束</li>
+</ul>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/12/18/cocos-ccactioninterval/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/12/18/cocos-ccactionmanager/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

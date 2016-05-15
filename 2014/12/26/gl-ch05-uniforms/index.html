@@ -1,0 +1,305 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Uniforms | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="Uniforms pass data directly from appliaction into any shader stage.
+Two flavors of uniforms:
+
+declared in the default block
+values are stored in buffe">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Uniforms"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">Uniforms</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-12-26</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  
+
+  
+	<div class="col-md-12">
+	  
+
+	  <!-- content -->
+	  <p>Uniforms pass data <strong>directly</strong> from appliaction into <strong>any shader</strong> stage.</p>
+<p>Two flavors of uniforms:</p>
+<ul>
+<li>declared in the default block</li>
+<li>values are stored in buffer objects</li>
+</ul>
+<h2 id="Defalut_Block_Uniforms"><a href="#Defalut_Block_Uniforms" class="headerlink" title="Defalut Block Uniforms"></a>Defalut Block Uniforms</h2><p>A uniform is how we pass data into a shader that <strong>stays the same</strong>.</p>
+<blockquote>
+<p>MOST COMMON UNIFORM<br>transformation matrix</p>
+</blockquote>
+<p>Any shader variable can be specified as a uniform, and uniforms can be in <strong>any shader stages</strong>.</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">uniform</span> <span class="keyword">float</span> fTime;</span><br><span class="line"><span class="keyword">uniform</span> <span class="keyword">int</span> iIndex;</span><br><span class="line"><span class="keyword">uniform</span> <span class="keyword">vec4</span> vColorValue;</span><br><span class="line"><span class="keyword">uniform</span> <span class="keyword">mat4</span> mvpMatrix;</span><br></pre></td></tr></table></figure>
+<p>Uniforms are always considered to be constant.</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">uniform</span> answer = <span class="number">42</span>;</span><br></pre></td></tr></table></figure>
+<p>if you <strong>declare the same unifrom</strong> in <strong>multiple shader stages</strong>, each of those stages will see the same value of that uniform.</p>
+<h2 id="Arranging_Your_Uniforms"><a href="#Arranging_Your_Uniforms" class="headerlink" title="Arranging Your Uniforms"></a>Arranging Your Uniforms</h2><p>Your shader code by using a location <strong><em>layout qualifier</em></strong>.</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">layout</span> (location = <span class="number">17</span>) <span class="keyword">uniform</span> <span class="keyword">vec4</span> myUniform;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>You can figure out what locations were assigned by calling the <strong>glGetUniformLocation()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">GLint <span class="title">glGetUniformLocation</span><span class="params">(GLuint program,</span><br><span class="line">                           <span class="keyword">const</span> GLchar* name)</span></span>;</span><br><span class="line"></span><br><span class="line">GLint iLocation = glGetUniformLocation(myProgram, <span class="string">"vColorValue"</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="Setting_Scalars_and_Vector_Uniforms"><a href="#Setting_Scalars_and_Vector_Uniforms" class="headerlink" title="Setting Scalars and Vector Uniforms"></a>Setting Scalars and Vector Uniforms</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">glUniform?f(GLint, ...);</span><br><span class="line">glUniform?i(GLint, ...);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>? : 1 to 4</p>
+</blockquote>
+<hr>
+<h2 id="Setting_Uniform_Arrays"><a href="#Setting_Uniform_Arrays" class="headerlink" title="Setting Uniform Arrays"></a>Setting Uniform Arrays</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glUniform??v(GLint location, GLuint count, <span class="keyword">const</span> GLxxxx * value);</span><br></pre></td></tr></table></figure>
+<h2 id="Setting_Uniform_Matrices"><a href="#Setting_Uniform_Matrices" class="headerlink" title="Setting Uniform Matrices"></a>Setting Uniform Matrices</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glUniformMatrix??v(GLint location, GLunit count, GLboolean transpose, <span class="keyword">const</span> GLXXXXX * m);</span><br></pre></td></tr></table></figure>
+<p>The Boolean flag transpose:</p>
+<ul>
+<li>matrix column-major -&gt; GL_FALSE</li>
+<li>matrix row-major -&gt; GL_TRUE</li>
+</ul>
+<h2 id="Uniform_Blocks"><a href="#Uniform_Blocks" class="headerlink" title="Uniform Blocks"></a>Uniform Blocks</h2><p>To alleviate the cost of all the <strong>glUniform*()</strong> calls, OpenGL allows you to combine a group of uniforms into a <strong><em>uniform block</em></strong> and store the whole block in a buffer object.</p>
+<p>You can’t keep the default bolck in a uniform buffer object; you need to creat one or more named uniform block.</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">uniform</span> TransformBlock</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">float</span> scale;</span><br><span class="line">    <span class="keyword">vec3</span> translation;</span><br><span class="line">    <span class="keyword">float</span> rotation[<span class="number">3</span>];</span><br><span class="line">    <span class="keyword">mat4</span> projection_matrix;</span><br><span class="line">&#125; transform;</span><br></pre></td></tr></table></figure>
+<h2 id="Building_Uniform_Blocks"><a href="#Building_Uniform_Blocks" class="headerlink" title="Building Uniform Blocks"></a>Building Uniform Blocks</h2><h3 id="standard_2C_agreed_upon_layout_for_the_data"><a href="#standard_2C_agreed_upon_layout_for_the_data" class="headerlink" title="standard, agreed upon layout for the data."></a>standard, agreed upon layout for the data.</h3><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">layout</span>(std140) <span class="keyword">uniform</span> TransformBlock</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">float</span> scale;</span><br><span class="line">    <span class="keyword">vec3</span> translation;</span><br><span class="line">    <span class="keyword">float</span> rotation[<span class="number">3</span>];</span><br><span class="line">    <span class="keyword">mat4</span> projection_matrix;</span><br><span class="line">&#125; transform;</span><br></pre></td></tr></table></figure>
+<p>Once a uniform block has ben decalred to use the stndard, or std140, layout, each member of the block consumes a predefined amount of space in the buffer and begins at an offset that is predictable by following a set of rules:</p>
+<ul>
+<li>Any type consuming N bytes in a buffer begins on a N-byte boundary within that buffer.</li>
+</ul>
+<h3 id="shared_layout_2C_let_OpenGL_decide_where_it_would_like_the_data"><a href="#shared_layout_2C_let_OpenGL_decide_where_it_would_like_the_data" class="headerlink" title="shared layout, let OpenGL decide where it would like the data."></a>shared layout, let OpenGL decide where it would like the data.</h3><p>You can determine the offsets that OpenGL assigned to your block members. Each member of a uniform block ahs an index that is used to efre to it to find its size and location within the block.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">glGetUniformIndices</span><span class="params">(GLuint program,</span><br><span class="line">                         GLsizei uniformCount,</span><br><span class="line">                         <span class="keyword">const</span> GLchar ** uniformNames,</span><br><span class="line">                         GLuint * uniformIndices)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> GLchar * uniformNames[<span class="number">4</span>] =</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"TransformBlock.scale"</span>,</span><br><span class="line">    <span class="string">"TransformBlock.translation"</span>,</span><br><span class="line">    <span class="string">"TransformBlock.rotation"</span>,</span><br><span class="line">    <span class="string">"TransformBlock.projection_matrix"</span>,</span><br><span class="line">&#125;;</span><br><span class="line">GLuint uniformIndices[<span class="number">4</span>];</span><br><span class="line"></span><br><span class="line">glGetUniformIndices(program, <span class="number">4</span>, uniformIndices, uniformIndices);</span><br></pre></td></tr></table></figure>
+<p>After you get the <strong>uniformIndices</strong> array, you have the indices, you can use them to find the location of the block members within the buffer.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">GLint uniformOffsets[<span class="number">4</span>];</span><br><span class="line">GLint arrayStrides[<span class="number">4</span>];</span><br><span class="line">GLint matrixStrides[<span class="number">4</span>];</span><br><span class="line"></span><br><span class="line">glGetActiveUniformsiv(program, <span class="number">4</span>, unifomIndices, GL_UNIFORM_OFFSET, uniformOffsets);</span><br><span class="line">glGetActiveUniformsiv(program, <span class="number">4</span>, unifomIndices, GL_UNIFORM_ARRAY_STRIDE, arrayStrides);</span><br><span class="line">glGetActiveUniformsiv(program, <span class="number">4</span>, unifomIndices, GL_UNIFORM_MATRIX_STRIDE, matrixStrides);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>unifomIndices</strong> contains the offsets of the members to the TransformBlock</li>
+<li><strong>arrayStrides</strong> contains the strides of the array members(only rotaion, for now)</li>
+<li><strong>matrixStrides</strong> contains the strides of the matrix members(only projection_matrix)</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">char</span> *buffer = (<span class="keyword">unsigned</span> <span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="number">4096</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// float</span></span><br><span class="line">*((<span class="keyword">float</span> *)(buffer + uniformOffsets[<span class="number">0</span>])) = <span class="number">3.0f</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// vec3</span></span><br><span class="line">((<span class="keyword">float</span>*)(buffer + uniformOffsets[<span class="number">1</span>]))[<span class="number">0</span>] = <span class="number">1.0f</span>;</span><br><span class="line">((<span class="keyword">float</span>*)(buffer + uniformOffsets[<span class="number">1</span>]))[<span class="number">1</span>] = <span class="number">1.0f</span>;</span><br><span class="line">((<span class="keyword">float</span>*)(buffer + uniformOffsets[<span class="number">1</span>]))[<span class="number">2</span>] = <span class="number">1.0f</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// array</span></span><br><span class="line"><span class="keyword">const</span> GLfloat roations[] = &#123;<span class="number">30.0f</span>, <span class="number">40.0f</span>, <span class="number">50.0f</span>&#125;;</span><br><span class="line"><span class="keyword">unsigned</span> <span class="keyword">int</span> offset = uniformOffsets[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> n = <span class="number">0</span>; n &lt; <span class="number">3</span>; n++)</span><br><span class="line">&#123;</span><br><span class="line">    *((<span class="keyword">float</span>*)(buffer + offset)) = rotations[n];</span><br><span class="line">    offset += arrayStrides[<span class="number">2</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// matrix</span></span><br><span class="line"><span class="keyword">const</span> GLfloat matrix[] = </span><br><span class="line">&#123;</span><br><span class="line">    <span class="number">1.0f</span>, <span class="number">2.0f</span>, <span class="number">3.0f</span>, <span class="number">4.0f</span>,</span><br><span class="line">    <span class="number">1.0f</span>, <span class="number">2.0f</span>, <span class="number">3.0f</span>, <span class="number">4.0f</span>,</span><br><span class="line">    <span class="number">1.0f</span>, <span class="number">2.0f</span>, <span class="number">3.0f</span>, <span class="number">4.0f</span>,</span><br><span class="line">    <span class="number">1.0f</span>, <span class="number">2.0f</span>, <span class="number">3.0f</span>, <span class="number">4.0f</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++)</span><br><span class="line">&#123;</span><br><span class="line">    GLint offset = uniformOffsets[<span class="number">3</span>] + matrixStride[<span class="number">3</span>] * i;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">4</span>; j++)</span><br><span class="line">    &#123;</span><br><span class="line">        *((<span class="keyword">float</span> *)(buffer + offset)) = matrix[i * <span class="number">4</span> + j];</span><br><span class="line">        offset += <span class="keyword">sizeof</span>(GLfloat);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>find a index of a uniform block in a program</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">GLuint <span class="title">glGetUniformBlockIndex</span><span class="params">(GLuint program,</span><br><span class="line">                              <span class="keyword">const</span> GLchar * uniformBlockName)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>two-step process to bind a buffer to a uniform block:</p>
+<ol>
+<li>Uniform blocks are assigned binding point</li>
+<li>buffers can be bound to those binding points</li>
+</ol>
+<p>to assign a binding point to a uniform block:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">glUniformBlockBinding</span><span class="params">(GLuint program,</span><br><span class="line">                           GLuint uniformBlockIndex,</span><br><span class="line">                           GLuint uniformBlockBinding)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>uniformBlockIndex is the index of the uniform block you are assiging a binding point to. (call glGetUniformBlockIndex)</li>
+<li>uniformBlockBinding is the index of the uniform block binding point.</li>
+</ul>
+<hr>
+<p>specify the binding index of your uniform blocks right in your shader code.</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">layout</span>(std140, binding = <span class="number">2</span>) <span class="keyword">uniform</span> TransformBlock</span><br><span class="line">&#123;</span><br><span class="line">    ....</span><br><span class="line">&#125; transfrom;</span><br></pre></td></tr></table></figure>
+<p>Assigning bindings in your shader code avoids the need to call glUniformBlockBinding()</p>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glBindBufferBase(GL_UNIFORM_BUFFER, index, buffer);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong><em>GL_UNIFORM_BUFFER</em></strong> tells OpenGl that we are binding a buffer to one of the uniform buffer binding point</li>
+<li><strong><em>index</em></strong> is the index of the binding point and should match waht you specifed either in your shader</li>
+<li><strong><em>buffer</em></strong> buffer is the name of the buffer object that you want to attach</li>
+</ul>
+<blockquote>
+<p><strong>index</strong> is not the index of the uniform block, but the index of the uniform buffer binding poing.</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">GLuint harry_index = glGetUniformBlockIndex(program, <span class="string">"Harry"</span>);</span><br><span class="line">GLuint bob_index = glGetUniformBlockIndex(program, <span class="string">"Bob"</span>);</span><br><span class="line">GLuint susan_index = glGetUniformBlockIndex(program, <span class="string">"Susan"</span>);</span><br><span class="line"></span><br><span class="line">glUniformBlockBinding(program, harry_index, <span class="number">1</span>);</span><br><span class="line">glUniformBlockBinding(program, bob_index, <span class="number">3</span>);</span><br><span class="line">glUniformBlockBinding(program, susan_index, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">glBindBufferBase(GL_UNIFORM_BUFFER, <span class="number">0</span>, buffer_b);</span><br><span class="line">glBindBufferBase(GL_UNIFORM_BUFFER, <span class="number">1</span>, buffer_c);</span><br><span class="line">glBindBufferBase(GL_UNIFORM_BUFFER, <span class="number">3</span>, buffer_a);</span><br></pre></td></tr></table></figure>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">layout</span> (binding = <span class="number">1</span>) <span class="keyword">uniform</span> Harry</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">layout</span> (binding = <span class="number">3</span>) <span class="keyword">uniform</span> Bob </span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">layout</span> (binding = <span class="number">0</span>) <span class="keyword">uniform</span> Susan </span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>the shader code is compiled and liked into ta program object, the bindings for the Harry, Bob, and Susan uniform blocks<br>will be set to the same thing as they would be after executing c code.</p>
+<hr>
+<p>The <strong>reason</strong> of setting the uniform block binding in the shader</p>
+<ul>
+<li>reduces numbers call to OpenGL</li>
+<li>allows the shader to associate a uniform block with a binding point without the block name.</li>
+<li>separate steady state from transient state</li>
+<li>uniform blocks can be quite large</li>
+</ul>
+<h2 id="Using_Unifroms_to_Transform_Geometry"><a href="#Using_Unifroms_to_Transform_Geometry" class="headerlink" title="Using Unifroms to Transform Geometry"></a>Using Unifroms to Transform Geometry</h2><p>This is the classic spinnig cube demo:</p>
+<ol>
+<li>create a unit cube located at the origin and store it in buffer objects</li>
+<li>use a vertex shader to apply a sequence of transforms</li>
+<li>construct a basic view matrix, multiply our model and view matrices together to produce a model-view matrix</li>
+<li>create a prespective transformation matrix representing some of the properties of our camera</li>
+<li>pass these into a simple vertex shader using uniforms and draw the cube on the screen</li>
+</ol>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/12/29/gl-ch05-shaderstorageblocks/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next disabled"><a>next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

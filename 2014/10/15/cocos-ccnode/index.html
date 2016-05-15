@@ -1,0 +1,337 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- Node | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="对于cocos2dx中的基类Node，一切都从这开始，Node这里值得分析的东西很多，看来是得花很长一个篇幅来讲。
+我预计可以分3块东西讲
+
+数学相关
+渲染相关
+引擎相关
+
+路径12d/base-node/CCNode.h&amp;#10;2d/base-node/CCNode.cpp
+类图先附上一张类图
+">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- Node"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- Node</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-10-15</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p>对于cocos2dx中的基类<code>Node</code>，一切都从这开始，Node这里值得分析的东西很多，看来是得花很长一个篇幅来讲。</p>
+<p>我预计可以分3块东西讲</p>
+<ol>
+<li>数学相关</li>
+<li>渲染相关</li>
+<li>引擎相关</li>
+</ol>
+<h2 id="u8DEF_u5F84"><a href="#u8DEF_u5F84" class="headerlink" title="路径"></a>路径</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2d/base-node/CCNode.h&#10;2d/base-node/CCNode.cpp</span><br></pre></td></tr></table></figure>
+<h2 id="u7C7B_u56FE"><a href="#u7C7B_u56FE" class="headerlink" title="类图"></a>类图</h2><p>先附上一张类图</p>
+<p><img src="http://www.cocos2d-x.org/reference/native-cpp/V3.2/d3/d82/classcocos2d_1_1_node.png" alt="Node子类"></p>
+<p>好长哦~~</p>
+<h2 id="u6E90_u7801_u5206_u6790"><a href="#u6E90_u7801_u5206_u6790" class="headerlink" title="源码分析"></a>源码分析</h2><p><code>Node</code>作为大部分子类的父类，可见是得好好分析分析。</p>
+<p>先贴上构造函数，析构函数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">Node::Node(<span class="keyword">void</span>)</span><br><span class="line">    <span class="comment">/* 此处略去构造函数初始化列表 */</span></span><br><span class="line">&#123;</span><br><span class="line">    Director *director = Director::getInstance();</span><br><span class="line">    <span class="comment">/* 获取全局的动作管理类 */</span></span><br><span class="line">    _actionManager = director-&gt;getActionManager();</span><br><span class="line">    _actionManager-&gt;retain();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 获取全局的定时器 */</span></span><br><span class="line">    _scheduler = director-&gt;getScheduler();</span><br><span class="line">    _scheduler-&gt;retain();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 获取全局的事件分配器 */</span></span><br><span class="line">    _eventDispatcher = director-&gt;getEventDispatcher();</span><br><span class="line">    _eventDispatcher-&gt;retain();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 矩阵相关 */</span></span><br><span class="line">    kmMat4Identity(&amp;_transform);</span><br><span class="line">    kmMat4Identity(&amp;_inverse);</span><br><span class="line">    kmMat4Identity(&amp;_additionalTransform);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Node::~Node()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* userObject 必须在先被释放，或许有来自这个Node的弱引用 */</span></span><br><span class="line">    <span class="comment">/* 这里先这样注释着，带我仔细研究一番，再来修改 */</span></span><br><span class="line">    CC_SAFE_RELEASE_NULL(_userObject);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 着色器相关 */</span></span><br><span class="line">    CC_SAFE_RELEASE_NULL(_shaderProgram);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 将子儿子的父节点置为nullptr */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; child : _children)</span><br><span class="line">    &#123;</span><br><span class="line">        child-&gt;_parent = <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 不知此为何物，等会儿看看~ */</span></span><br><span class="line">    <span class="comment">/* 数据驱动组件 */</span></span><br><span class="line">    <span class="comment">/* 默认是没有启用，若不用ECS来开发游戏的话，木有用~~ */</span></span><br><span class="line">    removeAllComponents();</span><br><span class="line">    CC_SAFE_DELETE(_componentContainer);</span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">if</span> CC_USE_PHYSICS</span></span><br><span class="line">    <span class="comment">/* 3.x 之后封装的物理引擎，据说有挺多问题 */</span></span><br><span class="line">    setPhysicsBody(<span class="literal">nullptr</span>);</span><br><span class="line"><span class="preprocessor">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 将Node::Node()中retain的release */</span></span><br><span class="line">    CC_SAFE_RELEASE_NULL(_actionManager);</span><br><span class="line">    CC_SAFE_RELEASE_NULL(_scheduler);</span><br><span class="line">    _eventDispatcher-&gt;removeEventListenersForTarget(<span class="keyword">this</span>);</span><br><span class="line">    CC_SAFE_RELEASE(_eventDispatcher);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>待我去看看Components是毛</p>
+<p>by etond 20141022 10:31</p>
+<hr>
+<p>bingling~</p>
+<p>我回来了，貌似传说中的<a href="http://chaimzane.iteye.com/blog/2007573" target="_blank" rel="external">数据驱动(Entiy-Component-System)</a>的组件~</p>
+<p>by etond 20141022 11:21</p>
+<p>自然还是需要google一番才是</p>
+<ul>
+<li><a href="http://www.gamedev.net/page/resources/_/technical/game-programming/understanding-component-entity-systems-r3013" target="_blank" rel="external">Understanding Component-Entity-Systems</a></li>
+<li><p><a href="http://www.gamedev.net/page/resources/_/technical/game-programming/understanding-component-entity-systems-r3013" target="_blank" rel="external">Implementing Component-Entity-Systems</a></p>
+</li>
+<li><p><a href="http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/" target="_blank" rel="external">Evolve Your Hierarchy Refactoring Game Entities with Components</a></p>
+</li>
+<li><p><a href="http://www.gamedev.net/page/resources/_/technical/game-programming/case-study-bomberman-mechanics-in-an-entity-component-system-r3159" target="_blank" rel="external">Case Study: Bomberman Mechanics in an Entity-Component-System</a></p>
+</li>
+</ul>
+<p>或许发现一个不错的网站 <a href="http://www.gamedev.net" target="_blank" rel="external">www.gamedev.net</a><br>下午好好研究这几篇文章之后再继续写</p>
+<p>我还找到了一个挺不错的ppt<a href="http://www.slideshare.net/gamelandvn/component-based-entity-system-mobile-game-development" target="_blank" rel="external">OGDC 2014: Component based entity system mobile game development</a></p>
+<p>by etond 20141022 11:44</p>
+<blockquote>
+<p>此块内容移步<a href="/2014-10-22/entity-component-system">Entity Component System</a></p>
+</blockquote>
+<hr>
+<p>终于从栈中递归出来了。（鼓掌~）</p>
+<p>这里先看看Node的<code>成员变量</code>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 位置，大小，缩放，扭曲，描点 */</span></span><br><span class="line"><span class="keyword">float</span> _rotationX;               </span><br><span class="line"><span class="keyword">float</span> _rotationY;              </span><br><span class="line"><span class="keyword">float</span> _rotationZ_X;             </span><br><span class="line"><span class="keyword">float</span> _rotationZ_Y;             </span><br><span class="line"><span class="keyword">float</span> _scaleX;                  </span><br><span class="line"><span class="keyword">float</span> _scaleY;                  </span><br><span class="line"><span class="keyword">float</span> _scaleZ;                  </span><br><span class="line">Point _position;                </span><br><span class="line"><span class="keyword">float</span> _positionZ;               </span><br><span class="line"><span class="keyword">float</span> _skewX;                   </span><br><span class="line"><span class="keyword">float</span> _skewY;                   </span><br><span class="line"><span class="comment">/* 转换坐标用 */</span></span><br><span class="line">Point _anchorPointInPoints;     </span><br><span class="line">Point _anchorPoint;             </span><br><span class="line">Size _contentSize;              </span><br><span class="line"></span><br><span class="line"><span class="comment">/* 投影矩阵 */</span></span><br><span class="line">kmMat4  _modelViewTransform;    </span><br><span class="line"><span class="comment">/* 变换矩阵 */</span></span><br><span class="line"><span class="keyword">mutable</span> kmMat4 _transform;      </span><br><span class="line"><span class="keyword">mutable</span> <span class="keyword">bool</span> _transformDirty;   </span><br><span class="line"><span class="comment">/* 逆矩阵，变换矩阵的逆矩阵 */</span></span><br><span class="line"><span class="comment">/* 作用就是撤销操作 */</span></span><br><span class="line"><span class="keyword">mutable</span> kmMat4 _inverse;        </span><br><span class="line"><span class="keyword">mutable</span> <span class="keyword">bool</span> _inverseDirty;     </span><br><span class="line"><span class="comment">/* 自定义矩阵 */</span></span><br><span class="line"><span class="comment">/* 和CCAtlasNode相关 */</span></span><br><span class="line"><span class="keyword">mutable</span> kmMat4 _additionalTransform; </span><br><span class="line"><span class="keyword">bool</span> _useAdditionalTransform;   </span><br><span class="line"><span class="keyword">bool</span> _transformUpdated;         </span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> _localZOrder;               </span><br><span class="line"><span class="keyword">float</span> _globalZOrder;            </span><br><span class="line">Vector&lt;Node*&gt; _children;        </span><br><span class="line">Node *_parent;                  </span><br><span class="line"><span class="keyword">int</span> _tag;                         </span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">string</span> _name;               </span><br><span class="line"></span><br><span class="line"><span class="comment">/* 用户数据 */</span></span><br><span class="line"><span class="keyword">void</span> *_userData;                </span><br><span class="line">Ref *_userObject;               </span><br><span class="line"></span><br><span class="line">GLProgram *_shaderProgram;      </span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> _orderOfArrival;            </span><br><span class="line"></span><br><span class="line">Scheduler *_scheduler;          </span><br><span class="line">ActionManager *_actionManager;  </span><br><span class="line">EventDispatcher* _eventDispatcher;  </span><br><span class="line"><span class="keyword">bool</span> _running;                  </span><br><span class="line"><span class="keyword">bool</span> _visible;                  </span><br><span class="line"><span class="keyword">bool</span> _ignoreAnchorPointForPosition; </span><br><span class="line"><span class="keyword">bool</span> _reorderChildDirty;          </span><br><span class="line"><span class="keyword">bool</span> _isTransitionFinished;       </span><br><span class="line"></span><br><span class="line"><span class="comment">/* 脚本相关 */</span></span><br><span class="line"><span class="keyword">int</span> _scriptHandler;               </span><br><span class="line"><span class="keyword">int</span> _updateScriptHandler;         </span><br><span class="line">ccScriptType _scriptType;         </span><br><span class="line"></span><br><span class="line"><span class="comment">/* ECS */</span></span><br><span class="line">ComponentContainer *_componentContainer;        </span><br><span class="line"></span><br><span class="line"><span class="comment">/* 物理引擎 */</span></span><br><span class="line">PhysicsBody* _physicsBody;        </span><br><span class="line"></span><br><span class="line">GLubyte     _displayedOpacity;</span><br><span class="line">GLubyte     _realOpacity;</span><br><span class="line">Color3B     _displayedColor;</span><br><span class="line">Color3B     _realColor;</span><br><span class="line"><span class="keyword">bool</span>        _cascadeColorEnabled;</span><br><span class="line"><span class="keyword">bool</span>        _cascadeOpacityEnabled;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* _orderOfArrival会慢慢递增，当_localZOrder相同时，按照这个来排序 */</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> s_globalOrderOfArrival;</span><br></pre></td></tr></table></figure>
+<p>(我赤裸裸的从源码里面拷贝了这些代码，并加上了邪恶的中文注释)</p>
+<h2 id="u6570_u5B66_u76F8_u5173"><a href="#u6570_u5B66_u76F8_u5173" class="headerlink" title="数学相关"></a>数学相关</h2><p>先看看<code>getNodeToParentTransform</code>的实现，这个方法每一帧都会被调用，去获得最新的变换矩阵。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> kmMat4&amp; Node::getNodeToParentTransform() <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_transformDirty)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* 位置 */</span></span><br><span class="line">        <span class="keyword">float</span> x = _position.x;</span><br><span class="line">        <span class="keyword">float</span> y = _position.y;</span><br><span class="line">        <span class="keyword">float</span> z = _positionZ;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 根据描点重新计算位置 */</span></span><br><span class="line">        <span class="keyword">if</span> (_ignoreAnchorPointForPosition)</span><br><span class="line">        &#123;</span><br><span class="line">            x += _anchorPointInPoints.x;</span><br><span class="line">            y += _anchorPointInPoints.y;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 旋转 */</span></span><br><span class="line">        <span class="keyword">float</span> cx = <span class="number">1</span>, sx = <span class="number">0</span>, cy = <span class="number">1</span>, sy = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> (_rotationZ_X || _rotationZ_Y)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">float</span> radiansX = -CC_DEGREES_TO_RADIANS(_rotationZ_X);</span><br><span class="line">            <span class="keyword">float</span> radiansY = -CC_DEGREES_TO_RADIANS(_rotationZ_Y);</span><br><span class="line">            cx = cosf(radiansX);</span><br><span class="line">            sx = sinf(radiansX);</span><br><span class="line">            cy = cosf(radiansY);</span><br><span class="line">            sy = sinf(radiansY);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">bool</span> needsSkewMatrix = ( _skewX || _skewY );</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 计算最终的坐标 */</span></span><br><span class="line">        <span class="keyword">if</span> (! needsSkewMatrix &amp;&amp; !_anchorPointInPoints.equals(Point::ZERO))</span><br><span class="line">        &#123;</span><br><span class="line">            x += cy * -_anchorPointInPoints.x * _scaleX + -sx * -_anchorPointInPoints.y * _scaleY;</span><br><span class="line">            y += sy * -_anchorPointInPoints.x * _scaleX +  cx * -_anchorPointInPoints.y * _scaleY;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 变换矩阵 */</span></span><br><span class="line">        kmScalar mat[] = &#123;</span><br><span class="line">            cy * _scaleX,   sy * _scaleX,   <span class="number">0</span>,          <span class="number">0</span>,</span><br><span class="line">            -sx * _scaleY,  cx * _scaleY,   <span class="number">0</span>,          <span class="number">0</span>,</span><br><span class="line">            <span class="number">0</span>,              <span class="number">0</span>,              _scaleZ,    <span class="number">0</span>,</span><br><span class="line">            x,              y,              z,          <span class="number">1</span> &#125;;</span><br><span class="line"></span><br><span class="line">        kmMat4Fill(&amp;_transform, mat);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 旋转矩阵 */</span></span><br><span class="line">        <span class="keyword">if</span>(_rotationY) &#123;</span><br><span class="line">            kmMat4 rotY;</span><br><span class="line">            kmMat4RotationY(&amp;rotY,CC_DEGREES_TO_RADIANS(_rotationY));</span><br><span class="line">            kmMat4Multiply(&amp;_transform, &amp;_transform, &amp;rotY);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(_rotationX) &#123;</span><br><span class="line">            kmMat4 rotX;</span><br><span class="line">            kmMat4RotationX(&amp;rotX,CC_DEGREES_TO_RADIANS(_rotationX));</span><br><span class="line">            kmMat4Multiply(&amp;_transform, &amp;_transform, &amp;rotX);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 扭曲 */</span></span><br><span class="line">        <span class="keyword">if</span> (needsSkewMatrix)</span><br><span class="line">        &#123;</span><br><span class="line">            kmMat4 skewMatrix = &#123; <span class="number">1</span>, (<span class="keyword">float</span>)tanf(CC_DEGREES_TO_RADIANS(_skewY)), <span class="number">0</span>, <span class="number">0</span>,</span><br><span class="line">                (<span class="keyword">float</span>)tanf(CC_DEGREES_TO_RADIANS(_skewX)), <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>,</span><br><span class="line">                <span class="number">0</span>,  <span class="number">0</span>,  <span class="number">1</span>, <span class="number">0</span>,</span><br><span class="line">                <span class="number">0</span>,  <span class="number">0</span>,  <span class="number">0</span>, <span class="number">1</span>&#125;;</span><br><span class="line"></span><br><span class="line">            kmMat4Multiply(&amp;_transform, &amp;_transform, &amp;skewMatrix);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!_anchorPointInPoints.equals(Point::ZERO))</span><br><span class="line">            &#123;</span><br><span class="line">                _transform.mat[<span class="number">12</span>] += _transform.mat[<span class="number">0</span>] * -_anchorPointInPoints.x + _transform.mat[<span class="number">4</span>] * -_anchorPointInPoints.y;</span><br><span class="line">                _transform.mat[<span class="number">13</span>] += _transform.mat[<span class="number">1</span>] * -_anchorPointInPoints.x + _transform.mat[<span class="number">5</span>] * -_anchorPointInPoints.y;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 自定义变换矩阵 */</span></span><br><span class="line">        <span class="keyword">if</span> (_useAdditionalTransform)</span><br><span class="line">        &#123;</span><br><span class="line">            kmMat4Multiply(&amp;_transform, &amp;_transform, &amp;_additionalTransform);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        _transformDirty = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> _transform;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，Node的位置，大小，旋转等成员变量都是在这里使用。</p>
+<p>PS：位置变换&amp;大小变换 == 位置变换矩阵x大小变换矩阵</p>
+<p>cocos2dx里面有一系列转换的函数，如获取当前节点在世界坐标的位置<br>这里就列出<code>convertToWorldSpace</code>的相关方法</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">kmMat4 Node::getNodeToWorldTransform() <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    kmMat4 t = <span class="keyword">this</span>-&gt;getNodeToParentTransform();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (Node *p = _parent; p != <span class="literal">nullptr</span>; p = p-&gt;getParent())</span><br><span class="line">        kmMat4Multiply(&amp;t, &amp;p-&gt;getNodeToParentTransform(), &amp;t);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">kmMat4 Node::getWorldToNodeTransform() <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    kmMat4 tmp, tmp2;</span><br><span class="line"></span><br><span class="line">    tmp2 = <span class="keyword">this</span>-&gt;getNodeToWorldTransform();</span><br><span class="line">    kmMat4Inverse(&amp;tmp, &amp;tmp2);</span><br><span class="line">    <span class="keyword">return</span> tmp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Point Node::convertToWorldSpace(<span class="keyword">const</span> Point&amp; nodePoint) <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    kmMat4 tmp = getNodeToWorldTransform();</span><br><span class="line">    kmVec3 vec3 = &#123;nodePoint.x, nodePoint.y, <span class="number">0</span>&#125;;</span><br><span class="line">    kmVec3 ret;</span><br><span class="line">    kmVec3Transform(&amp;ret, &amp;vec3, &amp;tmp);</span><br><span class="line">    <span class="keyword">return</span> Point(ret.x, ret.y);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从上面几个方法可以知道</p>
+<ol>
+<li>求当前节点到根节点的所有变换矩阵乘积 — 矩阵T</li>
+<li>求T其逆矩阵 — 矩阵iT</li>
+<li>根据逆矩阵和当前相对于父节点的位置，便可以得到世界坐标的位置。</li>
+</ol>
+<p><em>PS：涉及到线性代数逆矩阵相关东西 —- 3D数学第九章</em></p>
+<hr>
+<h2 id="u6E32_u67D3_u76F8_u5173"><a href="#u6E32_u67D3_u76F8_u5173" class="headerlink" title="渲染相关"></a>渲染相关</h2><h3 id="visit"><a href="#visit" class="headerlink" title="visit"></a>visit</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">void Node::visit(Renderer* renderer, const kmMat4 &#38;parentTransform, bool parentTransformUpdated)&#10;&#123;&#10;    if (!_visible) &#123; return; &#125;&#10;&#10;    bool dirty = _transformUpdated || parentTransformUpdated;&#10;    if(dirty)&#10;        _modelViewTransform = this-&#62;transform(parentTransform);&#10;    _transformUpdated = false;&#10;&#10;    /* &#30697;&#38453;&#26632; */&#10;    /* &#35201;&#34987;&#24323;&#29992; */&#10;    kmGLPushMatrix();&#10;    kmGLLoadMatrix(&#38;_modelViewTransform);&#10;&#10;    int i = 0;&#10;&#10;    /* &#28210;&#26579;&#26641; */&#10;    /* &#36882;&#24402;&#28210;&#26579;, dfs */&#10;    if(!_children.empty())&#10;    &#123;&#10;        /* &#20808;&#23545;&#23376;&#20799;&#23376;&#20204;&#25490;&#24207;&#65292;&#23601;&#26159;std::vector&#30340;&#25490;&#24207; */&#10;        sortAllChildren();&#10;&#10;        /* &#20808;&#32472;&#21046;&#22312;&#35813;Node&#19979;&#38754;&#30340; */&#10;        for( ; i &#60; _children.size(); i++ )&#10;        &#123;&#10;            auto node = _children.at(i);&#10;&#10;            if ( node &#38;&#38; node-&#62;_localZOrder &#60; 0 )&#10;                node-&#62;visit(renderer, _modelViewTransform, dirty);&#10;            else&#10;                break;&#10;        &#125;&#10;        /* &#28982;&#21518;&#32472;&#21046;&#35813;&#33410;&#28857; */&#10;        this-&#62;draw(renderer, _modelViewTransform, dirty);&#10;&#10;        /* &#28982;&#21518;&#32472;&#21046;&#22312;&#35813;Node&#19978;&#38754;&#30340;&#33410;&#28857; */&#10;        for(auto it=_children.cbegin()+i; it != _children.cend(); ++it)&#10;            (*it)-&#62;visit(renderer, _modelViewTransform, dirty);&#10;    &#125;&#10;    else&#10;    &#123;&#10;        this-&#62;draw(renderer, _modelViewTransform, dirty);&#10;    &#125;&#10;&#10;    /* &#36991;&#20813;&#20877;&#27425;&#25490;&#24207;? */&#10;    _orderOfArrival = 0;&#10;&#10;    kmGLPopMatrix();&#10;&#125;&#10;&#10;/* sortAllChildren&#30340;&#27604;&#36739;&#20989;&#25968; */&#10;ibool nodeComparisonLess(Node* n1, Node* n2)&#10;&#123;&#10;    return( n1-&#62;getLocalZOrder() &#60; n2-&#62;getLocalZOrder() ||&#10;            ( n1-&#62;getLocalZOrder() == n2-&#62;getLocalZOrder() &#10;           &#38;&#38; n1-&#62;getOrderOfArrival() &#60; n2-&#62;getOrderOfArrival() )&#10;    );&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的在visit中_orderOfArrival在渲染结束之后被置为0，这里结合nodeComparisonLess这个比较函数来看，<br>_orderOfArrival是Node维护的，每个节点的值都不同，而_localZOrder是用户自定义的，当_localZOrder相同的时候才去比较_orderOfArrival<br>将_orderOfArrival置为0的意思，是表示该节点已经排序过了。再排序的时候就不用做多余的交换操作。</p>
+<p><code>值得注意的是源码中的一句注释</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// <span class="doctag">XXX:</span> Yes, nodes might have a sort problem once every 15 days </span></span><br><span class="line"><span class="comment">//      if the game runs at 60 FPS and each frame sprites are reordered.</span></span><br><span class="line"><span class="keyword">int</span> Node::s_globalOrderOfArrival = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Node::setLocalZOrder(<span class="keyword">int</span> z)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_localZOrder == z)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    _localZOrder = z;</span><br><span class="line">    <span class="keyword">if</span> (_parent)</span><br><span class="line">    &#123;</span><br><span class="line">        _parent-&gt;reorderChild(<span class="keyword">this</span>, z);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    _eventDispatcher-&gt;setDirtyForNode(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Node::reorderChild(Node *child, <span class="keyword">int</span> zOrder)</span><br><span class="line">&#123;</span><br><span class="line">    CCASSERT( child != <span class="literal">nullptr</span>, <span class="string">"Child must be non-nil"</span>);</span><br><span class="line">    _reorderChildDirty = <span class="literal">true</span>;</span><br><span class="line">    child-&gt;setOrderOfArrival(s_globalOrderOfArrival++);</span><br><span class="line">    child-&gt;_setLocalZOrder(zOrder);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的问题应该是int溢出，根据上面的条件，下面这个等式</p>
+<blockquote>
+<p>2147482647  / 60 / 3600 / 24 / 27(Nodes) = 15 (days)</p>
+</blockquote>
+<p>不过这个问题出现的几率比较小，毕竟让这个s_globalOrderOfArrival整形溢出还是需要挺长时间的，毕竟不是每一帧都去改变很多的Node的_localZOrder值。</p>
+<h2 id="u5F15_u64CE_u76F8_u5173"><a href="#u5F15_u64CE_u76F8_u5173" class="headerlink" title="引擎相关"></a>引擎相关</h2><h3 id="addChild__26amp_3B_removeChild"><a href="#addChild__26amp_3B_removeChild" class="headerlink" title="addChild &amp; removeChild"></a>addChild &amp; removeChild</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Node::addChild(Node *child, <span class="keyword">int</span> zOrder, <span class="keyword">int</span> tag)</span><br><span class="line">&#123;    </span><br><span class="line">    CCASSERT( child != <span class="literal">nullptr</span>, <span class="string">"Argument must be non-nil"</span>);</span><br><span class="line">    CCASSERT( child-&gt;_parent == <span class="literal">nullptr</span>, <span class="string">"child already added. It can't be added again"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* std::vector的reserve */</span></span><br><span class="line">    <span class="keyword">if</span> (_children.empty()) &#123; <span class="keyword">this</span>-&gt;childrenAlloc(); &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这里把child加入cocos2d::Vector数组中 */</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;insertChild(child, zOrder);</span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">if</span> CC_USE_PHYSICS</span></span><br><span class="line">    <span class="comment">/* 略去 */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    child-&gt;_tag = tag;</span><br><span class="line"></span><br><span class="line">    child-&gt;setParent(<span class="keyword">this</span>);</span><br><span class="line">    child-&gt;setOrderOfArrival(s_globalOrderOfArrival++);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( _running )</span><br><span class="line">    &#123;</span><br><span class="line">        child-&gt;onEnter();</span><br><span class="line">        <span class="comment">/* 当在onEnter里面addChild的时候，防止onEnterTransitionDidFinish调用两次 */</span></span><br><span class="line">        <span class="keyword">if</span> (_isTransitionFinished) &#123; child-&gt;onEnterTransitionDidFinish(); &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (_cascadeColorEnabled) &#123; updateCascadeColor(); &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (_cascadeOpacityEnabled) &#123; updateCascadeOpacity(); &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Node::removeChild(Node* child, <span class="keyword">bool</span> cleanup <span class="comment">/* = true */</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_children.empty()) &#123; <span class="keyword">return</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">ssize_t</span> index = _children.getIndex(child);</span><br><span class="line">    <span class="keyword">if</span>( index != CC_INVALID_INDEX )</span><br><span class="line">        <span class="comment">/* 从cocos2d::Vector中删除 */</span></span><br><span class="line">        <span class="keyword">this</span>-&gt;detachChild( child, index, cleanup );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h3 id="onEnter__26amp_3B_onExit"><a href="#onEnter__26amp_3B_onExit" class="headerlink" title="onEnter &amp; onExit"></a>onEnter &amp; onExit</h3><p>代码中略去的脚本相关的代码 </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Node::onEnter()</span><br><span class="line">&#123;</span><br><span class="line">    _isTransitionFinished = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>( <span class="keyword">const</span> <span class="keyword">auto</span> &amp;child: _children)</span><br><span class="line">        child-&gt;onEnter();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>-&gt;resume();</span><br><span class="line"></span><br><span class="line">    _running = <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Node::onEnterTransitionDidFinish()</span><br><span class="line">&#123;</span><br><span class="line">    _isTransitionFinished = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">for</span>( <span class="keyword">const</span> <span class="keyword">auto</span> &amp;child: _children)</span><br><span class="line">        child-&gt;onEnterTransitionDidFinish();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Node::onExitTransitionDidStart()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span>( <span class="keyword">const</span> <span class="keyword">auto</span> &amp;child: _children)</span><br><span class="line">        child-&gt;onExitTransitionDidStart();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Node::onExit()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">this</span>-&gt;pause();</span><br><span class="line"></span><br><span class="line">    _running = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>( <span class="keyword">const</span> <span class="keyword">auto</span> &amp;child: _children)</span><br><span class="line">        child-&gt;onExit();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>onEnter</code>和<code>onExit</code>一样，都是通过递归调用去执行以当前节点为根的一颗渲染树=。=</p>
+<h2 id="Ending"><a href="#Ending" class="headerlink" title="Ending"></a>Ending</h2><p>这文章写了我好久，讲述下艰辛的历程：</p>
+<p>Node –&gt; ComponentContainer –&gt;  Entity Component System –&gt; template –&gt; c++泛型编程<br> |<br> |—–&gt; kazmath –&gt; 线性代数</p>
+<p>大概是这样，主要是自己本身基础不够扎实导致的各种问题。<br>还是得仔细研究研究c++ primer 5th才是啊，不然连c++都不会了要。</p>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/10/22/cocos-ccmenuitem/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/10/15/cocos-ccautoreleasepool/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- console | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="前天复习了下Python，目的如下：
+
+分析/cocos2dx项目根/tools/cocos-console/文件夹下的Python脚本
+整合TexturePacker至新的脚本之中，例如etcocos.py
+整合渠道分包apkpacker至新脚本之中
+
+做这些主要是为了方便工作，提高效率。
+
+环境">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- console"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- console</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-09-25</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p>前天复习了下<a href="https://github.com/monkeyde17/et-notes/tree/master/python" target="_blank" rel="external">Python</a>，目的如下：</p>
+<ul>
+<li>分析<code>/cocos2dx项目根/tools/cocos-console/</code>文件夹下的Python脚本</li>
+<li>整合<a href="/">TexturePacker</a>至新的脚本之中，例如<code>etcocos.py</code></li>
+<li>整合渠道分包<a href="/">apkpacker</a>至新脚本之中</li>
+</ul>
+<p>做这些主要是为了方便工作，提高效率。</p>
+<hr>
+<h2 id="u73AF_u5883_u8BF4_u660E"><a href="#u73AF_u5883_u8BF4_u660E" class="headerlink" title="环境说明"></a>环境说明</h2><ul>
+<li>cocos2dx 3.0</li>
+<li>OS X 10.9.4</li>
+<li>Python 2.7</li>
+</ul>
+<h2 id="u5DE5_u5177_u76EE_u5F55_u7ED3_u6784"><a href="#u5DE5_u5177_u76EE_u5F55_u7ED3_u6784" class="headerlink" title="工具目录结构"></a>工具目录结构</h2><p>贴上<code>cocos-console</code>文件夹下的文件结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cocos2d-console/&#10;&#9500;&#9472;&#9472; README.md&#10;&#9500;&#9472;&#9472; bin&#10;&#9474;&#160;&#160; &#9500;&#9472;&#9472; cocos&#10;&#9474;&#160;&#160; &#9500;&#9472;&#9472; cocos.bat&#10;&#9474;&#160;&#160; &#9500;&#9472;&#9472; cocos.py&#10;&#9474;&#160;&#160; &#9500;&#9472;&#9472; cocos2d.ini&#10;&#9474;&#160;&#160; &#9500;&#9472;&#9472; cocos_project.py&#10;&#9474;&#160;&#160; &#9492;&#9472;&#9472; install.py&#10;&#9492;&#9472;&#9472; plugins&#10;    &#9500;&#9472;&#9472; plugin_clean.py&#10;    &#9500;&#9472;&#9472; plugin_dist.py&#10;    &#9500;&#9472;&#9472; plugin_jscompile[+]&#10;    &#9500;&#9472;&#9472; plugin_update.py&#10;    &#9500;&#9472;&#9472; plugin_version.py&#10;    &#9500;&#9472;&#9472; project_compile&#10;    &#9474;&#160;&#160; &#9500;&#9472;&#9472; __init__.py&#10;    &#9474;&#160;&#160; &#9500;&#9472;&#9472; build_android.py&#10;    &#9474;&#160;&#160; &#9500;&#9472;&#9472; build_web[+]&#10;    &#9474;&#160;&#160; &#9500;&#9472;&#9472; project_compile.py&#10;    &#9500;&#9472;&#9472; project_deploy.py&#10;    &#9500;&#9472;&#9472; project_new&#10;    &#9474;&#160;&#160; &#9500;&#9472;&#9472; __init__.py&#10;    &#9474;&#160;&#160; &#9500;&#9472;&#9472; env.json&#10;    &#9474;&#160;&#160; &#9500;&#9472;&#9472; project_new.py&#10;    &#9474;&#160;&#160; &#9492;&#9472;&#9472; ui.py&#10;    &#9492;&#9472;&#9472; project_run&#10;        &#9500;&#9472;&#9472; __init__.py&#10;        &#9500;&#9472;&#9472; __init__.pyc&#10;        &#9500;&#9472;&#9472; bin&#10;        &#9474;&#160;&#160; &#9492;&#9472;&#9472; ios-sim&#10;        &#9492;&#9472;&#9472; project_run.py</span><br></pre></td></tr></table></figure>
+<p>由于对<code>Python</code>不太熟悉，所以找出了这些文件的Python的公共的类库：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Python 公共类库</span></span><br><span class="line"><span class="keyword">from</span> Queue <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> SimpleHTTPServer <span class="keyword">import</span> SimpleHTTPRequestHandler</span><br><span class="line"><span class="keyword">from</span> argparse <span class="keyword">import</span> ArgumentParser</span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict</span><br><span class="line"><span class="keyword">from</span> contextlib <span class="keyword">import</span> contextmanager</span><br><span class="line"><span class="keyword">from</span> core <span class="keyword">import</span> create_platform_projects</span><br><span class="line"><span class="keyword">from</span> optparse <span class="keyword">import</span> OptionParser</span><br><span class="line"><span class="keyword">from</span> queue <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> tarfile <span class="keyword">import</span> TarFile</span><br><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"><span class="keyword">from</span> xml.dom <span class="keyword">import</span> minidom</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> BaseHTTPServer</span><br><span class="line"><span class="keyword">import</span> ConfigParser</span><br><span class="line"><span class="keyword">import</span> getopt</span><br><span class="line"><span class="keyword">import</span> httplib</span><br><span class="line"><span class="keyword">import</span> inspect</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> platform</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> shutil</span><br><span class="line"><span class="keyword">import</span> subprocess</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> urllib</span><br><span class="line"><span class="keyword">import</span> webbrowser</span><br><span class="line"></span><br><span class="line"><span class="comment"># win32</span></span><br><span class="line"><span class="keyword">import</span> _winreg</span><br><span class="line"></span><br><span class="line"><span class="comment"># ui.py</span></span><br><span class="line"><span class="comment"># 这里是一个图形化界面</span></span><br><span class="line"><span class="comment"># 这里就不作分析啦</span></span><br><span class="line"><span class="keyword">from</span> Tkinter <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> tkFileDialog <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> tkMessageBox <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> tkinter <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> tkinter.filedialog <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> tkinter.messagebox <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line"><span class="comment">## 工具分析</span></span><br><span class="line"></span><br><span class="line">自然是先贴出入口函数啦：</span><br><span class="line"></span><br><span class="line">```py</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> _check_python_version():</span><br><span class="line">        exit()</span><br><span class="line"></span><br><span class="line">    plugins_path = os.path.join(os.path.dirname(__file__), <span class="string">'..'</span>, <span class="string">'plugins'</span>)</span><br><span class="line">    <span class="comment"># 引入插件模块</span></span><br><span class="line">    sys.path.append(plugins_path)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> len(sys.argv) == <span class="number">1</span> <span class="keyword">or</span> sys.argv[<span class="number">1</span>] <span class="keyword">in</span> (<span class="string">'-h'</span>, <span class="string">'--help'</span>):</span><br><span class="line">        help()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        <span class="comment"># 解析可用插件，返回可用插件列表</span></span><br><span class="line">        <span class="comment"># 主要是解析bin/cocos2d.in中的配置</span></span><br><span class="line">        <span class="comment"># 这里主要是用到了ConfigParser</span></span><br><span class="line">        plugins = parse_plugins()</span><br><span class="line">        command = sys.argv[<span class="number">1</span>]</span><br><span class="line">        argv = sys.argv[<span class="number">2</span>:]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 这里主要是run_plugin的实现</span></span><br><span class="line">        <span class="comment"># 主要功能当然是运行相应插件</span></span><br><span class="line">        <span class="keyword">if</span> command <span class="keyword">in</span> plugins:</span><br><span class="line">            run_plugin(command, argv, plugins)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> len(sys.argv) &gt; <span class="number">2</span>:</span><br><span class="line">                command = sys.argv[<span class="number">1</span>] + <span class="string">'_'</span> + sys.argv[<span class="number">2</span>]</span><br><span class="line">                argv = sys.argv[<span class="number">3</span>:]</span><br><span class="line">                <span class="keyword">if</span> command <span class="keyword">in</span> plugins:</span><br><span class="line">                    run_plugin(command, argv, plugins)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    <span class="comment"># 一些错误处理</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># 一些错误处理</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="comment"># 一些异常捕获处理</span></span><br></pre></td></tr></table></figure>
+<p>在讲<code>run_plugin</code>的实现之前，我觉得有必要说说<code>CCPlugin</code></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># cocos-console的所有插件必须是CCPlugin的子类</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CCPlugin</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 自然是运行命令</span></span><br><span class="line">    <span class="comment"># 涉及到subprocess这个公共库</span></span><br><span class="line">    <span class="comment"># 这个东西生成出来便是为了取代os.system等东西</span></span><br><span class="line">    <span class="comment"># 10.01前写篇文章分析下一些Python的公共类库</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_run_cmd</span><span class="params">(self, command)</span>:</span></span><br><span class="line">        CMDRunner.run_cmd(command, self._verbose)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_output_for</span><span class="params">(self, command)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> CMDRunner.output_for(command, self._verbose)</span><br><span class="line"></span><br><span class="line"><span class="decorator">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_log_path</span><span class="params">()</span>:</span></span><br><span class="line">        log_dir = os.path.expanduser(<span class="string">"~/.cocos2d"</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(log_dir):</span><br><span class="line">            os.mkdir(log_dir)</span><br><span class="line">        <span class="keyword">return</span> os.path.join(log_dir, <span class="string">"cocos2d.log"</span>)</span><br><span class="line"></span><br><span class="line"><span class="decorator">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">depends_on</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 返回插件的类型和名字</span></span><br><span class="line">    <span class="comment"># 这两个方法必须实现</span></span><br><span class="line">    <span class="comment"># 在parse_plugins中需要用到这两个字符串</span></span><br><span class="line"><span class="decorator">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">plugin_category</span><span class="params">()</span>:</span></span><br><span class="line">      <span class="keyword">return</span> <span class="string">""</span></span><br><span class="line"></span><br><span class="line"><span class="decorator">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">plugin_name</span><span class="params">()</span>:</span></span><br><span class="line">      <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="decorator">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">brief_description</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">init</span><span class="params">(self, args)</span>:</span></span><br><span class="line">        self._verbose = (<span class="keyword">not</span> args.quiet)</span><br><span class="line">        self._platforms = cocos_project.Platforms(self._project, args.platform)</span><br><span class="line">        <span class="keyword">if</span> self._platforms.none_active():</span><br><span class="line">            self._platforms.select_one()</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 运行插件=。=</span></span><br><span class="line">    <span class="comment"># 自然是插件的核心</span></span><br><span class="line">    <span class="comment"># 所有子类必须实现该方法</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self, argv)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_add_custom_options</span><span class="params">(self, parser)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_check_custom_options</span><span class="params">(self, args)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 这里主要是Python中的argparse公共库中ArgumentParser的使用</span></span><br><span class="line">    <span class="comment"># 感觉贴上来所有代码显得有点臃肿，所以这里就省去了这段代码</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">parse_args</span><span class="params">(self, argv)</span>:</span></span><br><span class="line">        <span class="comment"># 此处略去=。=</span></span><br></pre></td></tr></table></figure>
+<p><code>parse_plugins</code>主要做了两件事情：</p>
+<ol>
+<li>读取<code>cocos2d.ini</code>配置文件</li>
+<li>根据配置文件，将插件加载到列表里面，做一些检查之后返回该列表</li>
+</ol>
+<p>这里不贴上<code>parse_plugins</code>的代码，但是附上<code>cocos2d.ini</code>的主要内容：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[plugins]</span><br><span class="line">project_new.CCPluginNew</span><br><span class="line">project_compile.CCPluginCompile</span><br><span class="line">project_run.CCPluginRun</span><br><span class="line">project_deploy.CCPluginDeploy</span><br><span class="line">plugin_jscompile.CCPluginJSCompile</span><br></pre></td></tr></table></figure>
+<p>现在，看了<code>cocos2d.ini</code>主要内容之后，再结合根目录下的目录结构和<code>parse_plugins</code>的实现。</p>
+<p>可以知道<code>cocos-console</code>这个工具是通过插件的类型<code>project</code>，插件的名字<code>new</code>，和对应的类<code>CCPluginNew</code>做两种事情：</p>
+<ol>
+<li>加载<code>plugins/project_new</code>的<code>__init__.py</code>文件。</li>
+<li>直接加载<code>plugins</code>的下的<code>plugin_clean_.py</code>文件。</li>
+</ol>
+<p>若你只需要从<code>CCPlugin</code>继承过来，实现其接口，那就直接保存成一个文件。否则你需要新建一个同名文件夹，然后再文件夹下在加入一个<code>__init__.py</code>文件。这样做的目的主要还是保证插件的封装性。</p>
+<p>至于这个<code>__init__.py</code>文件，就很简单的引入<code>CCPluginXXXXX</code></p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> project_new <span class="keyword">import</span> CCPluginNew</span><br></pre></td></tr></table></figure>
+<h2 id="u603B_u7ED3"><a href="#u603B_u7ED3" class="headerlink" title="总结"></a>总结</h2><p>若要在cocos-console下自定义一个新的插件只需做两件事：</p>
+<ol>
+<li>在<code>plugin</code>文件夹下按照要求实现你所需要的功能</li>
+<li>在<code>cocos2d.ini</code>中加入你插件的配置信息</li>
+</ol>
+<p>接着就可以欢快的使用自己的插件啦~~~~</p>
+<hr>
+<h2 id="xxhash"><a href="#xxhash" class="headerlink" title="xxhash"></a>xxhash</h2><p><a href="https://github.com/monkeyde17/et-protect-package" target="_blank" rel="external">xxhash – Android防重编译</a></p>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+			
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/10/13/cocos-ccmenu/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next disabled"><a>next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Shader Storage Blocks | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="In addition ot the read-only access to buffer object that is provided by uniform blocks, buffer objects can also be used for general storage from shad">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Shader Storage Blocks"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">Shader Storage Blocks</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-12-29</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  
+
+  
+	<div class="col-md-12">
+	  
+
+	  <!-- content -->
+	  <p>In addition ot the read-only access to buffer object that is provided by uniform blocks, buffer objects can also be used for general storage from shaders using <strong>shader storage blocks</strong>.</p>
+<blockquote>
+<p>difference tetween a uniform block<br>your shader can write into the shader storage block<br>and can even perform atomic operations on members of a shader storage block.</p>
+</blockquote>
+<hr>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#version 430 core</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> my_structure</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> pea;</span><br><span class="line">    <span class="keyword">int</span> carrot;</span><br><span class="line">    <span class="keyword">vec4</span> potato;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">layout</span> (binding = <span class="number">0</span>, std430) buffer my_storage_block</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">vec4</span> foo;</span><br><span class="line">    <span class="keyword">vec3</span> bar;</span><br><span class="line">    <span class="keyword">int</span> baz[<span class="number">24</span>];</span><br><span class="line">    my_structure veggies;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>The members of a shader storage block can be referred to just as any other variable.</p>
+<h2 id="Atomic_Memory_Operations"><a href="#Atomic_Memory_Operations" class="headerlink" title="Atomic Memory Operations"></a>Atomic Memory Operations</h2><p>An atomic operation is a sequence of a read from memory potentially followed by a write to memory that must be uninterrupted for the result to be correct.</p>
+<hr>
+<p>Atomic Operations on Shader Storage Blocks:</p>
+<ul>
+<li>atomicAdd(mem, data)</li>
+<li>atomicAnd(mem, data)</li>
+<li>atomicOr(mem, data)</li>
+<li>atomicXor(mem, data)</li>
+<li>atomicMin(mem, data)</li>
+<li>atomicMax(mem, data)</li>
+<li>atomicExchange(mem, data)</li>
+<li>atomicCompSwap(mem, comp, data)</li>
+</ul>
+<h2 id="Synchronizing_Access_to_Memory"><a href="#Synchronizing_Access_to_Memory" class="headerlink" title="Synchronizing Access to Memory"></a>Synchronizing Access to Memory</h2><p>Memory hazards fall roughly into three categories:</p>
+<ul>
+<li><p>A Read-After-Write(RAW)</p>
+<p>  the read ends up being executed before the write is complete</p>
+</li>
+<li><p>A Write-After-Write(WAW)</p>
+<p>  write to the same memory location twice in a row<br>  you might expect that whatever data was written last would overwrite the data written first and be the values that end up staying in memory.</p>
+</li>
+<li><p>A Write-After-Read(WAR)</p>
+<p>  only occurs in parallel processing systems<br>  performs a write to memory after another thread believes that it has written to memory</p>
+</li>
+</ul>
+<h2 id="Using_Barriers_in_Your_Application"><a href="#Using_Barriers_in_Your_Application" class="headerlink" title="Using Barriers in Your Application"></a>Using Barriers in Your Application</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">glMemoryBarrier</span><span class="params">(GLbitfield barriers)</span></span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>barriers</strong> which allows you to specify which of OpenGL’s memory subsystems shoudl obey the barrier and which ones are free to ignore it and continue as they would have.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Mean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GL_ALL_BARRIER_BITS</td>
+<td>synchronize everything</td>
+</tr>
+<tr>
+<td>GL_SHADER_STORAGE_BARRIER_BIT</td>
+</tr>
+<tr>
+<td>GL_UNIFORM_BARRIER_BIT</td>
+</tr>
+<tr>
+<td>GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>The key to remember about glMemoryBarrier() is that the items included in barriers are the destination subsystems and that the mechanism by which you update the data isn’t relevat</p>
+</blockquote>
+<h2 id="Using_Barriers_in_Your_Shaders"><a href="#Using_Barriers_in_Your_Shaders" class="headerlink" title="Using Barriers in Your Shaders"></a>Using Barriers in Your Shaders</h2><p>Just as you can insert memory barriers in your application’s code to control the ordering of memory accesses performed by your shaders relative to your application, you can also insert barriers into your shaders to stop OpenGL from reading or writing memory in some order other thatn what your shader cdoe says.</p>
+<p>The basic memory barrier function in GLSL :</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> <span class="built_in">memoryBarrier</span>();</span><br></pre></td></tr></table></figure>
+<p>If you call memoryBarrier() from your shader code, any memory reads or wirtes that you might ahve performed will complete before the function returns.</p>
+<h2 id="Atomic_Counters"><a href="#Atomic_Counters" class="headerlink" title="Atomic Counters"></a>Atomic Counters</h2><p>Atomic counters atre a special type of variable that represents storage that is shared across multiple shader invocations. This storage is backed by a buffer object, and functions are provided in GLSL to increment and decrement the values stored in the buffer. What is special about these operations is that they a atomic</p>
+<p>If two shader invocations increment the same counter at the same time, OpenGL will make them take turns.</p>
+<hr>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">layout</span> (binding = <span class="number">0</span>) <span class="keyword">uniform</span> <span class="keyword">atomic_uint</span> my_variable;</span><br><span class="line"></span><br><span class="line"><span class="keyword">layout</span> (binding = <span class="number">3</span>, offset = <span class="number">8</span>) <span class="keyword">uniform</span> <span class="keyword">atomic_uint</span> my_variable;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">GLuint buf;</span><br><span class="line">glGenBuffers(<span class="number">1</span>, &amp;buf);</span><br><span class="line"></span><br><span class="line">glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, buf);</span><br><span class="line">glBufferData(GL_ATOMIC_COUNTER_BUFFER, <span class="number">16</span> * <span class="keyword">sizeof</span>(GLuint));</span><br><span class="line"></span><br><span class="line">glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, <span class="number">3</span>, buf);</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, buf);</span><br><span class="line"></span><br><span class="line">glBUfferSubData(GL_ATOMIC_COUNTER_BUFFER, <span class="number">2</span> * <span class="keyword">sizeof</span>(GLuint), <span class="keyword">sizeof</span>(GLuint), &amp;size)</span><br><span class="line"></span><br><span class="line">GLuint * data = (GLuint *)glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, <span class="number">0</span>, <span class="number">16</span> * <span class="keyword">sizeof</span>(GLuint),</span><br><span class="line">                                           GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);</span><br><span class="line"></span><br><span class="line">data[<span class="number">2</span>] = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);</span><br><span class="line"></span><br><span class="line">glClearBufferSubData(GL_ATOMIC_COUNTER_BUFFER, GL_R32UI, <span class="number">2</span> * <span class="keyword">sizeof</span>(GLuint), <span class="keyword">sizeof</span>(GLuint),</span><br><span class="line">                     GL_RED_INTEGER, GL_UNSIGNED_INT, &amp;zero);</span><br></pre></td></tr></table></figure>
+<hr>
+<ul>
+<li>to increment an atomic counter </li>
+</ul>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">uint</span> <span class="built_in">atomicCounterIncrement</span>(<span class="keyword">atomic_uint</span> c);</span><br></pre></td></tr></table></figure>
+<ol>
+<li>read the current value of the atomic counter</li>
+<li>adds one to it, write the new value back</li>
+<li>return the <strong>origin</strong> value it read</li>
+</ol>
+<ul>
+<li>to decrement an atomic counter</li>
+</ul>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">uint</span> <span class="built_in">atomicCounterDecrement</span>(<span class="keyword">atomic_uint</span> c);</span><br></pre></td></tr></table></figure>
+<ol>
+<li>reads the current value of the atomic counter</li>
+<li>subtracts one from it, writes the value back</li>
+<li>return the <strong>new</strong> value</li>
+</ol>
+<blockquote>
+<p>notice that this is the opposite of atomicCounterIncrement</p>
+</blockquote>
+<ul>
+<li>simply get the value of an atomic counter</li>
+</ul>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">uint</span> <span class="built_in">atomicCounter</span>(<span class="keyword">atomic_uint</span> c);</span><br></pre></td></tr></table></figure>
+<ol>
+<li>return the value</li>
+</ol>
+<hr>
+<p>Turn off writing to the framebuffer:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);</span><br></pre></td></tr></table></figure>
+<p>Trun on framebuffer writes:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);</span><br></pre></td></tr></table></figure>
+<h2 id="Synchronizing_Access_to_Atomic_Counters"><a href="#Synchronizing_Access_to_Atomic_Counters" class="headerlink" title="Synchronizing Access to Atomic Counters"></a>Synchronizing Access to Atomic Counters</h2><p>glMemoryBarrier() function supports a bit specifically for synchronizing access to atomic counters:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glMemoryBarrier(GL_ATOMIC_COUNTER_BARRIER_BIT)</span><br></pre></td></tr></table></figure>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+	
+	
+		<li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/12/26/gl-ch05-uniforms/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

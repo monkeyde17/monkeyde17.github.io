@@ -1,0 +1,293 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- Vector, Map | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="Vector其实就是对std::vector封装而来Map则默认是从std::unordered_map封装来的，如果想用std::map的话，则需要修改CCMap.h中的USE_STD_UNORDERED_MAP宏为0
+
+PS: std::unordered_map 是哈希表，查找是O(1)。st">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- Vector, Map"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- Vector, Map</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-12-10</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p><a href="/#Vecotr">Vector</a>其实就是对<code>std::vector</code>封装而来<br><a href="/#Map">Map</a>则默认是从<code>std::unordered_map</code>封装来的，如果想用<code>std::map</code>的话，则需要修改CCMap.h中的<code>USE_STD_UNORDERED_MAP</code>宏为0</p>
+<blockquote>
+<p>PS: std::unordered_map 是哈希表，查找是O(1)。std::map查找是O(n)。</p>
+</blockquote>
+<h2 id="u8DEF_u5F84"><a href="#u8DEF_u5F84" class="headerlink" title="路径"></a>路径</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">base/CCVector.h</span><br><span class="line">base/CCMap.h</span><br></pre></td></tr></table></figure>
+<h2 id="u6E90_u4EE3_u7801"><a href="#u6E90_u4EE3_u7801" class="headerlink" title="源代码"></a>源代码</h2><p>由于Vector和Map都是从STL封装而来，需要对原生的比较熟悉。</p>
+<h3 id="Vector"><a href="#Vector" class="headerlink" title="Vector"></a>Vector</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> CC_DLL Vector</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * typedef迭代器</span><br><span class="line">     */</span></span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;T&gt;::iterator iterator;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;T&gt;::const_iterator const_iterator;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;T&gt;::reverse_iterator reverse_iterator;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">typename</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;T&gt;::const_reverse_iterator const_reverse_iterator;</span><br><span class="line">    </span><br><span class="line">    <span class="function">iterator <span class="title">begin</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> _data.begin(); &#125;</span><br><span class="line">    <span class="function">const_iterator <span class="title">begin</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _data.begin(); &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function">iterator <span class="title">end</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> _data.end(); &#125;</span><br><span class="line">    <span class="function">const_iterator <span class="title">end</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _data.end(); &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function">const_iterator <span class="title">cbegin</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _data.cbegin(); &#125;</span><br><span class="line">    <span class="function">const_iterator <span class="title">cend</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _data.cend(); &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function">reverse_iterator <span class="title">rbegin</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> _data.rbegin(); &#125;</span><br><span class="line">    <span class="function">const_reverse_iterator <span class="title">rbegin</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _data.rbegin(); &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function">reverse_iterator <span class="title">rend</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> _data.rend(); &#125;</span><br><span class="line">    <span class="function">const_reverse_iterator <span class="title">rend</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _data.rend(); &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function">const_reverse_iterator <span class="title">crbegin</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _data.crbegin(); &#125;</span><br><span class="line">    <span class="function">const_reverse_iterator <span class="title">crend</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _data.crend(); &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 构造函数 */</span></span><br><span class="line">    Vector&lt;T&gt;()</span><br><span class="line">    : _data()</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* c++11新特性 */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/* static_assert 静态断言，用于模板调试，在编译时确定 */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/* std::is_convertible 判断T是否是Ref的子类 */</span></span><br><span class="line">        <span class="comment">/* 此处默认 T 是一个对象指针类型，如果不是的话， 就直接报错了*/</span></span><br><span class="line">        <span class="keyword">static_assert</span>(<span class="built_in">std</span>::is_convertible&lt;T, Ref*&gt;::value, <span class="string">"Invalid Type for cocos2d::Vector&lt;T&gt;!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 带容量的构造函数 */</span></span><br><span class="line">    <span class="keyword">explicit</span> Vector&lt;T&gt;(<span class="keyword">ssize_t</span> capacity)</span><br><span class="line">    : _data()</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">static_assert</span>(<span class="built_in">std</span>::is_convertible&lt;T, Ref*&gt;::value, <span class="string">"Invalid Type for cocos2d::Vector&lt;T&gt;!"</span>);</span><br><span class="line">        CCLOGINFO(<span class="string">"In the default constructor with capacity of Vector."</span>);</span><br><span class="line">        reserve(capacity);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 析构函数 */</span></span><br><span class="line">    ~Vector&lt;T&gt;()</span><br><span class="line">    &#123;</span><br><span class="line">        CCLOGINFO(<span class="string">"In the destructor of Vector."</span>);</span><br><span class="line">        clear();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 拷贝构造函数 */</span></span><br><span class="line">    Vector&lt;T&gt;(<span class="keyword">const</span> Vector&lt;T&gt;&amp; other)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">static_assert</span>(<span class="built_in">std</span>::is_convertible&lt;T, Ref*&gt;::value, <span class="string">"Invalid Type for cocos2d::Vector&lt;T&gt;!"</span>);</span><br><span class="line">        CCLOGINFO(<span class="string">"In the copy constructor!"</span>);</span><br><span class="line">        _data = other._data;</span><br><span class="line">        addRefForAllObjects();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* c++11新特性 std::move */</span></span><br><span class="line">    Vector&lt;T&gt;(Vector&lt;T&gt;&amp;&amp; other)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">static_assert</span>(<span class="built_in">std</span>::is_convertible&lt;T, Ref*&gt;::value, <span class="string">"Invalid Type for cocos2d::Vector&lt;T&gt;!"</span>);</span><br><span class="line">        CCLOGINFO(<span class="string">"In the move constructor of Vector!"</span>);</span><br><span class="line">        _data = <span class="built_in">std</span>::move(other._data);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    Vector&lt;T&gt;&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Vector&lt;T&gt;&amp; other)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span> != &amp;other) &#123;</span><br><span class="line">            CCLOGINFO(<span class="string">"In the copy assignment operator!"</span>);</span><br><span class="line">            clear();</span><br><span class="line">            _data = other._data;</span><br><span class="line">            addRefForAllObjects();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 赋值操作符 */</span></span><br><span class="line">    Vector&lt;T&gt;&amp; <span class="keyword">operator</span>=(Vector&lt;T&gt;&amp;&amp; other)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span> != &amp;other) &#123;</span><br><span class="line">            CCLOGINFO(<span class="string">"In the move assignment operator!"</span>);</span><br><span class="line">            clear();</span><br><span class="line">            _data = <span class="built_in">std</span>::move(other._data);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 扩容 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reserve</span><span class="params">(ssize_t n)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        _data.reserve(n);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 设置容量 */</span></span><br><span class="line">    <span class="keyword">ssize_t</span> capacity() <span class="keyword">const</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> _data.capacity();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 当前大小 */</span></span><br><span class="line">    <span class="keyword">ssize_t</span> size() <span class="keyword">const</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>  _data.size();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 是否为空 */</span></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="keyword">const</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> _data.empty();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 最大size, 不是实际大小 */</span></span><br><span class="line">    <span class="keyword">ssize_t</span> max_size() <span class="keyword">const</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> _data.max_size();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 找下标 */</span></span><br><span class="line">    <span class="keyword">ssize_t</span> getIndex(T object) <span class="keyword">const</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">auto</span> iter = <span class="built_in">std</span>::find(_data.begin(), _data.end(), object);</span><br><span class="line">        <span class="keyword">if</span> (iter != _data.end())</span><br><span class="line">            <span class="keyword">return</span> iter - _data.begin();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 查找 */</span></span><br><span class="line">    <span class="function">const_iterator <span class="title">find</span><span class="params">(T object)</span> <span class="keyword">const</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">std</span>::find(_data.begin(), _data.end(), object);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function">iterator <span class="title">find</span><span class="params">(T object)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">std</span>::find(_data.begin(), _data.end(), object);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 根据下标返回元素 */</span></span><br><span class="line">    <span class="function">T <span class="title">at</span><span class="params">(ssize_t index)</span> <span class="keyword">const</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        CCASSERT( index &gt;= <span class="number">0</span> &amp;&amp; index &lt; size(), <span class="string">"index out of range in getObjectAtIndex()"</span>);</span><br><span class="line">        <span class="keyword">return</span> _data[index];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 返回第一个元素 */</span></span><br><span class="line">    <span class="function">T <span class="title">front</span><span class="params">()</span> <span class="keyword">const</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> _data.front();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 最后一个元素 */</span></span><br><span class="line">    <span class="function">T <span class="title">back</span><span class="params">()</span> <span class="keyword">const</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> _data.back();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 随机返回一个元素 */</span></span><br><span class="line">    <span class="function">T <span class="title">getRandomObject</span><span class="params">()</span> <span class="keyword">const</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!_data.empty())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">ssize_t</span> randIdx = rand() % _data.size();</span><br><span class="line">            <span class="keyword">return</span> *(_data.begin() + randIdx);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 查找是否有该元素 */</span></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">contains</span><span class="params">(T object)</span> <span class="keyword">const</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span>( <span class="built_in">std</span>::find(_data.begin(), _data.end(), object) != _data.end() );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 判断两个Vector是否相等 */</span></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">equals</span><span class="params">(<span class="keyword">const</span> Vector&lt;T&gt; &amp;other)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">ssize_t</span> s = <span class="keyword">this</span>-&gt;size();</span><br><span class="line">        <span class="keyword">if</span> (s != other.size())</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">ssize_t</span> i = <span class="number">0</span>; i &lt; s; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>-&gt;at(i) != other.at(i))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 入栈 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">pushBack</span><span class="params">(T object)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        CCASSERT(object != <span class="literal">nullptr</span>, <span class="string">"The object should not be nullptr"</span>);</span><br><span class="line">        _data.push_back( object );</span><br><span class="line">        object-&gt;retain();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 从另外一个Vector加入到当前Vector */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">pushBack</span><span class="params">(<span class="keyword">const</span> Vector&lt;T&gt;&amp; other)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;obj : other) &#123;</span><br><span class="line">            _data.push_back(obj);</span><br><span class="line">            obj-&gt;retain();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 根据下标插入元素 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">insert</span><span class="params">(ssize_t index, T object)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        CCASSERT(index &gt;= <span class="number">0</span> &amp;&amp; index &lt;= size(), <span class="string">"Invalid index!"</span>);</span><br><span class="line">        CCASSERT(object != <span class="literal">nullptr</span>, <span class="string">"The object should not be nullptr"</span>);</span><br><span class="line">        _data.insert((<span class="built_in">std</span>::begin(_data) + index), object);</span><br><span class="line">        object-&gt;retain();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 出栈 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">popBack</span><span class="params">()</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        CCASSERT(!_data.empty(), <span class="string">"no objects added"</span>);</span><br><span class="line">        <span class="keyword">auto</span> last = _data.back();</span><br><span class="line">        _data.pop_back();</span><br><span class="line">        last-&gt;release();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 删除某对象 */</span></span><br><span class="line">    <span class="comment">/* removeAll 是表示是否删除所有相同值的对象 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">eraseObject</span><span class="params">(T object, <span class="keyword">bool</span> removeAll = <span class="literal">false</span>)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        CCASSERT(object != <span class="literal">nullptr</span>, <span class="string">"The object should not be nullptr"</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (removeAll)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">auto</span> iter = _data.begin(); iter != _data.end();)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> ((*iter) == object)</span><br><span class="line">                &#123;</span><br><span class="line">                    iter = _data.erase(iter);</span><br><span class="line">                    object-&gt;release();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    ++iter;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">auto</span> iter = <span class="built_in">std</span>::find(_data.begin(), _data.end(), object);</span><br><span class="line">            <span class="keyword">if</span> (iter != _data.end())</span><br><span class="line">            &#123;</span><br><span class="line">                _data.erase(iter);</span><br><span class="line">                object-&gt;release();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 根据迭代器删除元素 */</span></span><br><span class="line">    <span class="function">iterator <span class="title">erase</span><span class="params">(iterator position)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        CCASSERT(position &gt;= _data.begin() &amp;&amp; position &lt; _data.end(), <span class="string">"Invalid position!"</span>);</span><br><span class="line">        (*position)-&gt;release();</span><br><span class="line">        <span class="keyword">return</span> _data.erase(position);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 删除两个迭代器之间的元素 */</span></span><br><span class="line">    <span class="function">iterator <span class="title">erase</span><span class="params">(iterator first, iterator last)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> iter = first; iter != last; ++iter)</span><br><span class="line">        &#123;</span><br><span class="line">            (*iter)-&gt;release();</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> _data.erase(first, last);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 根据下标删除元素 */</span></span><br><span class="line">    <span class="function">iterator <span class="title">erase</span><span class="params">(ssize_t index)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        CCASSERT(!_data.empty() &amp;&amp; index &gt;=<span class="number">0</span> &amp;&amp; index &lt; size(), <span class="string">"Invalid index!"</span>);</span><br><span class="line">        <span class="keyword">auto</span> it = <span class="built_in">std</span>::next( begin(), index );</span><br><span class="line">        <span class="comment">/* 先release下 */</span></span><br><span class="line">        (*it)-&gt;release();</span><br><span class="line">        <span class="keyword">return</span> _data.erase(it);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 遍历所有元素 */</span></span><br><span class="line">    <span class="comment">/* 将所有元素release一下 */</span></span><br><span class="line">    <span class="comment">/* 清空数组 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>( <span class="keyword">auto</span> it = <span class="built_in">std</span>::begin(_data); it != <span class="built_in">std</span>::end(_data); ++it ) &#123;</span><br><span class="line">            (*it)-&gt;release();</span><br><span class="line">        &#125;</span><br><span class="line">        _data.clear();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 根据元素地址交换对象 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(T object1, T object2)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">ssize_t</span> idx1 = getIndex(object1);</span><br><span class="line">        <span class="keyword">ssize_t</span> idx2 = getIndex(object2);</span><br><span class="line"></span><br><span class="line">        CCASSERT(idx1&gt;=<span class="number">0</span> &amp;&amp; idx2&gt;=<span class="number">0</span>, <span class="string">"invalid object index"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">std</span>::swap( _data[idx1], _data[idx2] );</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 根据元素下标交换对象 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(ssize_t index1, ssize_t index2)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        CCASSERT(index1 &gt;=<span class="number">0</span> &amp;&amp; index1 &lt; size() &amp;&amp; index2 &gt;= <span class="number">0</span> &amp;&amp; index2 &lt; size(), <span class="string">"Invalid indices"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">std</span>::swap( _data[index1], _data[index2] );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 替换对象 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">replace</span><span class="params">(ssize_t index, T object)</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        CCASSERT(index &gt;= <span class="number">0</span> &amp;&amp; index &lt; size(), <span class="string">"Invalid index!"</span>);</span><br><span class="line">        CCASSERT(object != <span class="literal">nullptr</span>, <span class="string">"The object should not be nullptr"</span>);</span><br><span class="line">        </span><br><span class="line">        _data[index]-&gt;release();</span><br><span class="line">        _data[index] = object;</span><br><span class="line">        object-&gt;retain();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 反转数组 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">reverse</span><span class="params">()</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="built_in">std</span>::reverse( <span class="built_in">std</span>::begin(_data), <span class="built_in">std</span>::end(_data) );</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/** Shrinks the vector so the memory footprint corresponds with the number of items */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">shrinkToFit</span><span class="params">()</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        _data.shrink_to_fit();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 为Vector中的所有对象retian一下下 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addRefForAllObjects</span><span class="params">()</span></span><br><span class="line">    </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;obj : _data) &#123;</span><br><span class="line">            obj-&gt;retain();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;T&gt; _data;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>上述代码中有许多c++11的特性，先来看看构造函数中的代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static_assert</span>(<span class="built_in">std</span>::is_convertible&lt;T, Ref*&gt;::value, <span class="string">"ERROR INFO"</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>static_assert是静态断言，用于模板编程的调试，在编译时就可以引发断言 </li>
+<li>std::is_convertible是判断<code>*T</code>类是否为<code>Ref</code>的子类，因为在Vector中的操作包含retain/release</li>
+</ul>
+<p>比如说我们写如下下面就会报错</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> A : <span class="keyword">public</span> cocos2d::Ref</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    A() &#123;&#125;;</span><br><span class="line">    ~A() &#123;&#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span><br><span class="line"></span>&#123;</span><br><span class="line">    cocos2d::Vector&lt;A*&gt; va; <span class="comment">// 正确方法</span></span><br><span class="line">    cocos2d::Vector&lt;A&gt; va;  <span class="comment">// 直接编译报错！</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有时候需要自定义类型且不从cocos2d::Ref继承过来，就只能用std::vector了。</p>
+<p>然后，我比较疑惑的地方在于std::move什么的。<br>还是附上一些链接</p>
+<p><a href="http://en.cppreference.com/w/cpp/utility/move" target="_blank" rel="external">cppreference – std::move</a><br><a href="http://www.cnblogs.com/cbscan/archive/2012/01/10/2318482.html" target="_blank" rel="external">关于C++11中的std::move和std::forward</a></p>
+<hr>
+<p>源码中注释掉了这么一段代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">T&amp; <span class="keyword">operator</span>[](<span class="keyword">int</span> index)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> _data[index];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> T&amp; <span class="keyword">operator</span>[](<span class="keyword">int</span> index) <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> _data[index];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不对<code>[]</code>运算符进行重载的原因在于，你在用<code>[]</code>的时候无法判断是否应该<code>retain/release</code><br>所以源码的注释中也提示不要使用下标运算符。</p>
+<p>就比如说一下代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">cocos2d::Vector&lt;Sprite*&gt; sv;</span><br><span class="line"></span><br><span class="line">Sprite *pS = Sprite::create();</span><br><span class="line"></span><br><span class="line">sv.pushBack(pS);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 这个时候不需要retain/release */</span></span><br><span class="line">sv[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 这个时候就需要了 */</span></span><br><span class="line">sv[<span class="number">0</span>] = Sprite::create(); <span class="comment">// 用 replace 来替代</span></span><br></pre></td></tr></table></figure>
+<h3 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h3><p>关于Map的话，从封装的思路上和Vector是一样的。</p>
+<ul>
+<li>不要用<code>[]</code>运算符</li>
+<li>对于Map<k, v="">中的*V必须是Ref的子类</k,></li>
+</ul>
+<p>唯一值得关注的就是Map中有一个USE_STD_UNORDERED_MAP的宏去控制是否需要使用std::map，因为默认是使用std::unordered_map的。</p>
+<hr>
+<blockquote>
+<p>这里就不贴上代码了。</p>
+</blockquote>
+<h2 id="u603B_u7ED3"><a href="#u603B_u7ED3" class="headerlink" title="总结"></a>总结</h2><p>其实对于Vector和Map，我用的不是很多，大多时候就直接使用STL。<br>分析Vector和Map实际上还是对阅读源码有帮助。</p>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/12/10/cocos-macros/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/11/24/cocos-appdelegate/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

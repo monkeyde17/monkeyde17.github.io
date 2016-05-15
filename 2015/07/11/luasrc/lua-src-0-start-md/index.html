@@ -1,0 +1,260 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Lua 源码清除计划 -- 开篇 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="引用自http://www.reddit.com/comments/63hth/ask_reddit_which_oss_codebases_out_there_are_so/c02pxbp
+推荐阅读顺序
+lmathlib.c, lstrlib.c
+
+get familiar with the ex">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Lua 源码清除计划 -- 开篇"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">Lua 源码清除计划 -- 开篇</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2015-07-11</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  
+
+  
+	<div class="col-md-12">
+	  
+
+	  <!-- content -->
+	  <p>引用自<a href="http://www.reddit.com/comments/63hth/ask_reddit_which_oss_codebases_out_there_are_so/c02pxbp" target="_blank" rel="external">http://www.reddit.com/comments/63hth/ask_reddit_which_oss_codebases_out_there_are_so/c02pxbp</a></p>
+<h2 id="u63A8_u8350_u9605_u8BFB_u987A_u5E8F"><a href="#u63A8_u8350_u9605_u8BFB_u987A_u5E8F" class="headerlink" title="推荐阅读顺序"></a>推荐阅读顺序</h2><ul>
+<li>lmathlib.c, lstrlib.c</li>
+</ul>
+<p>get familiar with the external C API. Don’t bother with the pattern matcher though. Just the easy functions.</p>
+<ul>
+<li>lapi.c</li>
+</ul>
+<p>Check how the API is implemented internally. Only skim this to get a feeling for the code. Cross-reference to lua.h and luaconf.h as needed.</p>
+<ul>
+<li>lobject.h</li>
+</ul>
+<p>tagged values and object representation. skim through this first. you’ll want to keep a window with this file open all the time.</p>
+<ul>
+<li>lstate.h</li>
+</ul>
+<p>state objects. ditto.</p>
+<ul>
+<li>lopcodes.h</li>
+</ul>
+<p>bytecode instruction format and opcode definitions. easy.</p>
+<ul>
+<li>lvm.c </li>
+</ul>
+<p>scroll down to luaV_execute, the main interpreter loop. see how all of the instructions are implemented. skip the details for now. reread later.</p>
+<ul>
+<li>ldo.c</li>
+</ul>
+<p>calls, stacks, exceptions, coroutines. tough read.</p>
+<ul>
+<li>lstring.c</li>
+</ul>
+<p>string interning. cute, huh?</p>
+<ul>
+<li>ltable.c</li>
+</ul>
+<p>hash tables and arrays. tricky code.</p>
+<ul>
+<li>ltm.c</li>
+</ul>
+<p>metamethod handling, reread all of lvm.c now.<br>You may want to reread lapi.c now.</p>
+<ul>
+<li>ldebug.c</li>
+</ul>
+<p>surprise waiting for you. abstract interpretation is used to find object names for tracebacks. does bytecode verification, too.</p>
+<ul>
+<li>lparser.c, lcode.c</li>
+</ul>
+<p>recursive descent parser, targetting a register-based VM. start from chunk() and work your way through. read the expression parser and the code generator parts last.</p>
+<ul>
+<li>lgc.c</li>
+</ul>
+<p>incremental garbage collector. take your time.</p>
+<p>Read all the other files as you see references to them. Don’t let your stack get too deep though.<br>If you’re done before X-Mas and understood all of it, you’re good. The information density of the code is rather high.</p>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+			
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+	
+	
+		<li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next disabled"><a>next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

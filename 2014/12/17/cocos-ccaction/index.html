@@ -1,0 +1,301 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- Action | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="Action动作基类，被 ActionManager 管理着。（cocos2dx 3.0 —- ActionManager）
+类图Action类图
+路径122d/actions/ccaction.h2d/actions/ccaction.cpp
+源码分析Action先看看Action的声明
+1234">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- Action"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- Action</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-12-17</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p><code>Action</code>动作基类，被 ActionManager 管理着。（<a href="/2014-12-18/cocos-ccactionmanager">cocos2dx 3.0 —- ActionManager</a>）</p>
+<h2 id="u7C7B_u56FE"><a href="#u7C7B_u56FE" class="headerlink" title="类图"></a>类图</h2><p><a href="http://www.cocos2d-x.org/reference/native-cpp/V3.3rc0/db/d61/classcocos2d_1_1_action.png" target="_blank" rel="external">Action类图</a></p>
+<h2 id="u8DEF_u5F84"><a href="#u8DEF_u5F84" class="headerlink" title="路径"></a>路径</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2</span>d/actions/ccaction.h</span><br><span class="line"><span class="number">2</span>d/actions/ccaction.cpp</span><br></pre></td></tr></table></figure>
+<h2 id="u6E90_u7801_u5206_u6790"><a href="#u6E90_u7801_u5206_u6790" class="headerlink" title="源码分析"></a>源码分析</h2><h3 id="Action"><a href="#Action" class="headerlink" title="Action"></a>Action</h3><p>先看看Action的声明</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> CC_DLL Action : <span class="keyword">public</span> Ref, <span class="keyword">public</span> Clonable</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> INVALID_TAG = -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">virtual</span> <span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">description</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 返回拷贝动作 */</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Action* <span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 返回逆动作 */</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Action* <span class="title">reverse</span><span class="params">()</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 动作是否结束 */</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">isDone</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 在动作开始前调用 */</span></span><br><span class="line">    <span class="comment">/* 初始化 */</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">startWithTarget</span><span class="params">(Node *target)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 不要自己调用stop */</span></span><br><span class="line">    <span class="comment">/* 把这破事交给ActionManger吧 */</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 在ActionManager的update中每一帧调用 */</span></span><br><span class="line">    <span class="comment">/* PS ：原文注释中提示，如果你不知道自己在做什么，就不要重写step */</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">step</span><span class="params">(<span class="keyword">float</span> dt)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 每一帧调用的函数 */</span></span><br><span class="line">    <span class="comment">/* time的值是从 0 到 1 */</span></span><br><span class="line">    <span class="comment">/* 0   表示开始 */</span></span><br><span class="line">    <span class="comment">/* 0.5 表示执行一半 */</span></span><br><span class="line">    <span class="comment">/* 1   表示结束 */</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(<span class="keyword">float</span> time)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">inline</span> Node* <span class="title">getTarget</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _target; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">setTarget</span><span class="params">(Node *target)</span> </span>&#123; _target = target; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">inline</span> Node* <span class="title">getOriginalTarget</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _originalTarget; &#125;</span><br><span class="line">    <span class="comment">/* 弱引用 ？ */</span></span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">setOriginalTarget</span><span class="params">(Node *originalTarget)</span> </span>&#123; _originalTarget = originalTarget; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">int</span> <span class="title">getTag</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _tag; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">setTag</span><span class="params">(<span class="keyword">int</span> tag)</span> </span>&#123; _tag = tag; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    Action();</span><br><span class="line">    <span class="keyword">virtual</span> ~Action();</span><br><span class="line"></span><br><span class="line">    Node    *_originalTarget;</span><br><span class="line">    <span class="comment">/* 用startWithTarget设置 */</span></span><br><span class="line">    <span class="comment">/* 当调用stop的时候置为null */</span></span><br><span class="line">    Node    *_target;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 标识 */</span></span><br><span class="line">    <span class="keyword">int</span>     _tag;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">/* 禁用拷贝构造函数, 禁止重载等号运算符 */</span></span><br><span class="line">    CC_DISALLOW_COPY_AND_ASSIGN(Action);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>其中 Clonable 只是一个接口，用于对象的拷贝，除此之外Action还禁用了<code>拷贝构造函数</code>和<code>重载等号运算符</code>。<br>对于一个Action的子类，你要实现实现以下方法：</p>
+<ul>
+<li>virtual Action* clone() const = 0;</li>
+<li>virtual Action* reverse() const = 0;</li>
+<li>virtual bool isDone() const;</li>
+<li>virtual void startWithTarget(Node *target);</li>
+</ul>
+<h3 id="FiniteTimeAction__u2013__u6709_u9650_u65F6_u95F4_u52A8_u4F5C"><a href="#FiniteTimeAction__u2013__u6709_u9650_u65F6_u95F4_u52A8_u4F5C" class="headerlink" title="FiniteTimeAction – 有限时间动作"></a>FiniteTimeAction – 有限时间动作</h3><p>FiniteTimeAction即ActionInstant和ActionIntavel的父类。</p>
+<h4 id="ActionInstant"><a href="#ActionInstant" class="headerlink" title="ActionInstant"></a>ActionInstant</h4><ul>
+<li>duration = 0</li>
+<li>只调用一次</li>
+</ul>
+<blockquote>
+<p><a href="/2014-12-18/cocos-ccactioninstant">cocos2dx 3.0 —- ActionInstant</a></p>
+</blockquote>
+<h4 id="ActionInterval"><a href="#ActionInterval" class="headerlink" title="ActionInterval"></a>ActionInterval</h4><ul>
+<li>duration &gt;= 0</li>
+<li>可能调用多次</li>
+</ul>
+<blockquote>
+<p><a href="/2014-12-18/cocos-ccactioninterval">cocos2dx 3.0 —- ActionInterval</a></p>
+</blockquote>
+<hr>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> CC_DLL FiniteTimeAction : <span class="keyword">public</span> Action</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">float</span> <span class="title">getDuration</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _duration; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">setDuration</span><span class="params">(<span class="keyword">float</span> duration)</span> </span>&#123; _duration = duration; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> FiniteTimeAction* <span class="title">reverse</span><span class="params">()</span> <span class="keyword">const</span> override </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> FiniteTimeAction* <span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span> override </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    FiniteTimeAction() : _duration(<span class="number">0</span>) &#123;&#125;</span><br><span class="line">    <span class="keyword">virtual</span> ~FiniteTimeAction()&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 时长 */</span></span><br><span class="line">    <span class="keyword">float</span> _duration;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CC_DISALLOW_COPY_AND_ASSIGN(FiniteTimeAction);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>然后就木有然后了。就定义了一个接口给<code>瞬时动作</code>和<code>延时动作</code>用。</p>
+<h3 id="Speed__u2013__u53D8_u901F_u52A8_u4F5C"><a href="#Speed__u2013__u53D8_u901F_u52A8_u4F5C" class="headerlink" title="Speed            – 变速动作"></a>Speed            – 变速动作</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> CC_DLL Speed : <span class="keyword">public</span> Action</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* 此处略去 */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="comment">/* 在step中起关键作用 */</span></span><br><span class="line">    <span class="keyword">float</span> _speed;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 保存目标动作 */</span></span><br><span class="line">    <span class="comment">/* 强引用 */</span></span><br><span class="line">    ActionInterval *_innerAction;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CC_DISALLOW_COPY_AND_ASSIGN(Speed);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>step代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Speed::step(<span class="keyword">float</span> dt) </span><br><span class="line">&#123;</span><br><span class="line">    _innerAction-&gt;step(dt * _speed);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最最关键的一点就在于此 — <code>dt * _speed</code></p>
+<h3 id="Follow__u2013__u8DDF_u968F_u52A8_u4F5C"><a href="#Follow__u2013__u8DDF_u968F_u52A8_u4F5C" class="headerlink" title="Follow           – 跟随动作"></a>Follow           – 跟随动作</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> CC_DLL Follow : <span class="keyword">public</span> Action</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">static</span> Follow* <span class="title">create</span><span class="params">(Node *followedNode, <span class="keyword">const</span> Rect&amp; rect = Rect::ZERO)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">bool</span> <span class="title">isBoundarySet</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _boundarySet; &#125;</span><br><span class="line">    <span class="comment">/* 开启关闭边界 */</span></span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">setBoudarySet</span><span class="params">(<span class="keyword">bool</span> value)</span> </span>&#123; _boundarySet = value; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Follow* <span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Follow* <span class="title">reverse</span><span class="params">()</span> <span class="keyword">const</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">step</span><span class="params">(<span class="keyword">float</span> dt)</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">isDone</span><span class="params">()</span> <span class="keyword">const</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span> override</span>;</span><br><span class="line"></span><br><span class="line">CC_CONSTRUCTOR_ACCESS:</span><br><span class="line">    <span class="comment">/* 略去初始化函数，以及初始化列表 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">virtual</span> ~Follow();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 跟随节点的引用计数会增加 */</span></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">initWithTarget</span><span class="params">(Node *followedNode, <span class="keyword">const</span> Rect&amp; rect = Rect::ZERO)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="comment">/* 跟随节点 */</span></span><br><span class="line">    Node *_followedNode;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 是否开启边界 */</span></span><br><span class="line">    <span class="keyword">bool</span> _boundarySet;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 若边界大于整个屏幕，则不需要跟随动作了 */</span></span><br><span class="line">    <span class="keyword">bool</span> _boundaryFullyCovered;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 快速访问屏幕尺寸 */</span></span><br><span class="line">    Point _halfScreenSize;</span><br><span class="line">    Point _fullScreenSize;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 边界 */</span></span><br><span class="line">    <span class="keyword">float</span> _leftBoundary;</span><br><span class="line">    <span class="keyword">float</span> _rightBoundary;</span><br><span class="line">    <span class="keyword">float</span> _topBoundary;</span><br><span class="line">    <span class="keyword">float</span> _bottomBoundary;</span><br><span class="line">    Rect _worldRect;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CC_DISALLOW_COPY_AND_ASSIGN(Follow);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>大致的流程是这样的：</p>
+<ol>
+<li>initWithTarget，传入跟随节点，修正自身位置（超出边界的情况）</li>
+<li>step 根据边界来计算出自身位置，并设置成计算后的位置。</li>
+</ol>
+<h2 id="u603B_u7ED3"><a href="#u603B_u7ED3" class="headerlink" title="总结"></a>总结</h2><p>看看还是蛮简单<code>=.. =</code></p>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/12/18/cocos-ccactionmanager/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/12/12/cocos-uthash/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

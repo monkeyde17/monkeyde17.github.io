@@ -1,0 +1,346 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- ActionInterval | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="ActionInterval延时动作
+路径122d/actions/ActionInterval.h2d/actions/ActionInterval.cpp
+源码根据分析ActionInstant的经验，
+1234567891011121314151617181920212223242526272">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- ActionInterval"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- ActionInterval</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-12-18</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p><code>ActionInterval</code>延时动作</p>
+<h2 id="u8DEF_u5F84"><a href="#u8DEF_u5F84" class="headerlink" title="路径"></a>路径</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2</span>d/actions/ActionInterval.h</span><br><span class="line"><span class="number">2</span>d/actions/ActionInterval.cpp</span><br></pre></td></tr></table></figure>
+<h2 id="u6E90_u7801"><a href="#u6E90_u7801" class="headerlink" title="源码"></a>源码</h2><p>根据分析ActionInstant的经验，</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> CC_DLL ActionInterval : <span class="keyword">public</span> FiniteTimeAction</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">float</span> <span class="title">getElapsed</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123; <span class="keyword">return</span> _elapsed; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 在GridAction中使用 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setAmplitudeRate</span><span class="params">(<span class="keyword">float</span> amp)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">getAmplitudeRate</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">isDone</span><span class="params">(<span class="keyword">void</span>)</span> <span class="keyword">const</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">step</span><span class="params">(<span class="keyword">float</span> dt)</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">startWithTarget</span><span class="params">(Node *target)</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> ActionInterval* <span class="title">reverse</span><span class="params">()</span> <span class="keyword">const</span> override </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> ActionInterval *<span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span> override </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="comment">/* 初始化动作 */</span></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">initWithDuration</span><span class="params">(<span class="keyword">float</span> d)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 动作执行了多少时间 */</span></span><br><span class="line">    <span class="keyword">float</span>   _elapsed;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 是否是第一次执行step */</span></span><br><span class="line">    <span class="keyword">bool</span>    _firstTick;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/****************CPP**********************/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">bool</span> ActionInterval::initWithDuration(<span class="keyword">float</span> d)</span><br><span class="line">&#123;</span><br><span class="line">    _duration = d;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (_duration == <span class="number">0</span>) &#123;</span><br><span class="line">        _duration = FLT_EPSILON;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    _elapsed = <span class="number">0</span>;</span><br><span class="line">    _firstTick = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">bool</span> ActionInterval::isDone(<span class="keyword">void</span>) <span class="keyword">const</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> _elapsed &gt;= _duration;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> ActionInterval::step(<span class="keyword">float</span> dt)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_firstTick) &#123;</span><br><span class="line">        _firstTick = <span class="literal">false</span>;</span><br><span class="line">        _elapsed = <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        _elapsed += dt;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这段代码主要是计算任务执行百分比 [0.0f, 1.0f] */</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;update(MAX(<span class="number">0</span>, </span><br><span class="line">                     MIN(<span class="number">1</span>,</span><br><span class="line">                         _elapsed / MAX(_duration, FLT_EPSILON) <span class="comment">// 防止除0</span></span><br><span class="line">                     )</span><br><span class="line">                 )</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> ActionInterval::startWithTarget(Node *target)</span><br><span class="line">&#123;</span><br><span class="line">    FiniteTimeAction::startWithTarget(target);</span><br><span class="line">    _elapsed = <span class="number">0.0f</span>;</span><br><span class="line">    _firstTick = <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>和ActionInstant类似，ActionInterval也是在step中调用update。</li>
+</ul>
+<hr>
+<p>有些功能性延时动作十分常用：</p>
+<ul>
+<li>Sequence</li>
+<li>Repeat</li>
+<li>RepeatForever</li>
+<li>Spawn (直接多次runAction)</li>
+<li>Animate</li>
+</ul>
+<hr>
+<p>除此之外，就是视觉性延时动作</p>
+<ul>
+<li>MoveTo</li>
+<li>MoveBy</li>
+<li>RotateTo</li>
+<li>RotateBy</li>
+<li>SnewTo</li>
+<li>SnewBy</li>
+<li>JumpTo</li>
+<li>JumpBy</li>
+<li>BezielTo</li>
+<li>BezierBy</li>
+<li>ScaleTo</li>
+<li>ScaleBy</li>
+<li>Blink</li>
+<li>FadeIn</li>
+<li>FadeOut</li>
+<li>FadeTo</li>
+<li>TintTo</li>
+<li>TintBy</li>
+<li>DelayTime</li>
+<li>ReverseTime</li>
+</ul>
+<hr>
+<ul>
+<li>TargetedAction</li>
+</ul>
+<h3 id="ExtraAction"><a href="#ExtraAction" class="headerlink" title="ExtraAction"></a>ExtraAction</h3><p>继承自FiniteTimeAction，什么都没实现，在Sequence，Spawn里作为一个结束动作。</p>
+<blockquote>
+<p>PS : 默认Action的isDone返回的是true</p>
+</blockquote>
+<h3 id="Sequence"><a href="#Sequence" class="headerlink" title="Sequence"></a>Sequence</h3><p>首先，我们来看看一个Sequence是怎么执行的？</p>
+<p>例如有如下一个Sequence：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[[[[A0, A1], A2] A3] ExtraEnd]&#10;&#10;S0 = [A0, A1]&#10;S1 = [S0, A2]&#10;S2 = [S1, A3]&#10;S3 = [S2, ExtraEnd]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>其中An表示延时任务</li>
+<li>ExtraEnd表示ExtraAction</li>
+<li>Sn表示Sequence</li>
+</ul>
+<p>所以执行S3的执行流程如下</p>
+<ol>
+<li>执行S3的第一个Action (S2)</li>
+<li>执行S3的第二个Action (ExtarEnd)</li>
+</ol>
+<blockquote>
+<p>执行过程有点递归的意思。<br>执行S2的时候需要执行S1和A3。然后执行S1的时候需要执行S0和A2。执行S0的时候需要执行A0和A1。<br>所以，执行的顺序还是A0 -&gt; A1 -&gt; A2 -&gt; A3 -&gt; ExtraEnd</p>
+</blockquote>
+<hr>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** @brief Runs actions sequentially, one after another</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">class</span> CC_DLL Sequence : <span class="keyword">public</span> ActionInterval</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"></span><br><span class="line">    <span class="comment">/************************/</span></span><br><span class="line">    <span class="comment">/* 此处略去wpf8相关东西 */</span></span><br><span class="line">    <span class="comment">/************************/</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> Sequence* <span class="title">create</span><span class="params">(FiniteTimeAction *action1, ...)</span> CC_REQUIRES_NULL_TERMINATION</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** helper constructor to create an array of sequenceable actions given an array</span><br><span class="line">     * @code</span><br><span class="line">     * When this funtion bound to the js or lua,the input params changed</span><br><span class="line">     * in js  :var   create(var   object1,var   object2, ...)</span><br><span class="line">     * in lua :local create(local object1,local object2, ...)</span><br><span class="line">     * @endcode</span><br><span class="line">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> Sequence* <span class="title">create</span><span class="params">(<span class="keyword">const</span> Vector&lt;FiniteTimeAction*&gt;&amp; arrayOfActions)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> Sequence* <span class="title">createWithVariableList</span><span class="params">(FiniteTimeAction *action1, va_list args)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这个是最基础的类方法，其他类方法都是基于此 */</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> Sequence* <span class="title">createWithTwoActions</span><span class="params">(FiniteTimeAction *actionOne, FiniteTimeAction *actionTwo)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Sequence* <span class="title">clone</span><span class="params">()</span> <span class="keyword">const</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Sequence* <span class="title">reverse</span><span class="params">()</span> <span class="keyword">const</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">startWithTarget</span><span class="params">(Node *target)</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">(<span class="keyword">void</span>)</span> override</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(<span class="keyword">float</span> t)</span> override</span>;</span><br><span class="line"></span><br><span class="line">CC_CONSTRUCTOR_ACCESS:</span><br><span class="line">    Sequence() &#123;&#125;</span><br><span class="line">    <span class="keyword">virtual</span> ~Sequence(<span class="keyword">void</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">initWithTwoActions</span><span class="params">(FiniteTimeAction *pActionOne, FiniteTimeAction *pActionTwo)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    FiniteTimeAction *_actions[<span class="number">2</span>];</span><br><span class="line">    <span class="comment">/* 第一个Action所占的时间比例 */</span></span><br><span class="line">    <span class="keyword">float</span> _split;</span><br><span class="line">    <span class="comment">/* 上一次执行的Action序号 */</span></span><br><span class="line">    <span class="keyword">int</span> _last;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CC_DISALLOW_COPY_AND_ASSIGN(Sequence);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>先看看初始化方法。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> Sequence::initWithTwoActions(FiniteTimeAction *actionOne, FiniteTimeAction *actionTwo)</span><br><span class="line">&#123;</span><br><span class="line">    CCASSERT(actionOne != <span class="literal">nullptr</span>, <span class="string">""</span>);</span><br><span class="line">    CCASSERT(actionTwo != <span class="literal">nullptr</span>, <span class="string">""</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">float</span> d = actionOne-&gt;getDuration() + actionTwo-&gt;getDuration();</span><br><span class="line">    ActionInterval::initWithDuration(d);</span><br><span class="line"></span><br><span class="line">    _actions[<span class="number">0</span>] = actionOne;</span><br><span class="line">    actionOne-&gt;retain();</span><br><span class="line"></span><br><span class="line">    _actions[<span class="number">1</span>] = actionTwo;</span><br><span class="line">    actionTwo-&gt;retain();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>给Action增加引用计数，设置了Sequence的时间。</p>
+<hr>
+<p>当我们让一个对象runAction(Sequence)的时候，最先调用以下代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Sequence::startWithTarget(Node *target)</span><br><span class="line">&#123;</span><br><span class="line">    ActionInterval::startWithTarget(target);</span><br><span class="line">    _split = _actions[<span class="number">0</span>]-&gt;getDuration() / _duration;</span><br><span class="line">    _last = -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里计算出_split的值，也就是两个Action之间的分割线 =。=</p>
+<blockquote>
+<p>注意在startWithTarget中没有调用两个Action的startWithTarget（在update中调用）</p>
+</blockquote>
+<hr>
+<p>然后再来看看update方法</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Sequence::update(<span class="keyword">float</span> t)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> found = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">float</span> <span class="keyword">new_t</span> = <span class="number">0.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 先判断是那个Action需要执行 */</span></span><br><span class="line">    <span class="keyword">if</span>( t &lt; _split ) &#123;</span><br><span class="line">        <span class="comment">/* action[0] */</span></span><br><span class="line">        found = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span>( _split != <span class="number">0</span> )</span><br><span class="line">            <span class="comment">/* 计算新的比率给该Action使用 */</span></span><br><span class="line">            <span class="comment">/* 即调用 action-&gt;update(new_t) */</span></span><br><span class="line">            <span class="keyword">new_t</span> = t / _split;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">new_t</span> = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* action[1] */</span></span><br><span class="line">        found = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> ( _split == <span class="number">1</span> )</span><br><span class="line">            <span class="keyword">new_t</span> = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="comment">/* 计算新的比率给该Action使用 */</span></span><br><span class="line">            <span class="comment">/* 即调用 action-&gt;update(new_t) */</span></span><br><span class="line">            <span class="keyword">new_t</span> = (t-_split) / (<span class="number">1</span> - _split );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 如果是第二个需要执行 */</span></span><br><span class="line">    <span class="keyword">if</span> ( found==<span class="number">1</span> ) &#123;</span><br><span class="line">        <span class="comment">/* 则需要先把第一个Action给结束掉 */</span></span><br><span class="line">        <span class="keyword">if</span>( _last == -<span class="number">1</span> ) &#123;</span><br><span class="line">            <span class="comment">/* 第一个Action还没开始执行过 */</span></span><br><span class="line">            _actions[<span class="number">0</span>]-&gt;startWithTarget(_target);</span><br><span class="line">            _actions[<span class="number">0</span>]-&gt;update(<span class="number">1.0f</span>);</span><br><span class="line">            _actions[<span class="number">0</span>]-&gt;stop();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>( _last == <span class="number">0</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">/* 第一个Action已经执行过 */</span></span><br><span class="line">            _actions[<span class="number">0</span>]-&gt;update(<span class="number">1.0f</span>);</span><br><span class="line">            _actions[<span class="number">0</span>]-&gt;stop();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* 如果是第一个需要执行，而且上一个执行的动作是第二个 */</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(found==<span class="number">0</span> &amp;&amp; _last==<span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* reverse导致的问题 */</span></span><br><span class="line">        _actions[<span class="number">1</span>]-&gt;update(<span class="number">0</span>); <span class="comment">/* 这里的update(0) 表示结束，因为reverse了嘛*/</span></span><br><span class="line">        _actions[<span class="number">1</span>]-&gt;stop();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 若当前动作已经执行完毕 */</span></span><br><span class="line">    <span class="keyword">if</span>( found == _last &amp;&amp; _actions[found]-&gt;isDone() )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 开始新的动作 */</span></span><br><span class="line">    <span class="comment">/* 一般是从 0 到 1 */</span></span><br><span class="line">    <span class="keyword">if</span>( found != _last )</span><br><span class="line">    &#123;</span><br><span class="line">        _actions[found]-&gt;startWithTarget(_target);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 每一帧的更新 */</span></span><br><span class="line">    _actions[found]-&gt;update(<span class="keyword">new_t</span>);</span><br><span class="line">    _last = found;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过分析以上代码，我们可以知道update在管理着这两个Action的开始和结束。</p>
+<h3 id="Repeat"><a href="#Repeat" class="headerlink" title="Repeat"></a>Repeat</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> CC_DLL Repeat : <span class="keyword">public</span> ActionInterval</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">/****************/</span></span><br><span class="line">    <span class="comment">/* 略去所有函数 */</span></span><br><span class="line">    <span class="comment">/****************/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="comment">/* 重复次数 */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> _times;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 当前重复次数 */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> _total;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 每次所占时间比率 */</span></span><br><span class="line">    <span class="keyword">float</span> _nextDt;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 是否是瞬时动作 */</span></span><br><span class="line">    <span class="keyword">bool</span> _actionInstant;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 待执行动作 */</span></span><br><span class="line">    FiniteTimeAction *_innerAction;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    CC_DISALLOW_COPY_AND_ASSIGN(Repeat);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>初始化函数 </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> Repeat::initWithAction(FiniteTimeAction *action, <span class="keyword">unsigned</span> <span class="keyword">int</span> times)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">float</span> d = action-&gt;getDuration() * times;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (ActionInterval::initWithDuration(d))</span><br><span class="line">    &#123;</span><br><span class="line">        _times = times;</span><br><span class="line">        _innerAction = action;</span><br><span class="line">        action-&gt;retain();</span><br><span class="line"></span><br><span class="line">        _actionInstant = <span class="keyword">dynamic_cast</span>&lt;ActionInstant*&gt;(action) ? <span class="literal">true</span> : <span class="literal">false</span>;</span><br><span class="line">        <span class="comment">//an instant action needs to be executed one time less in the update method since it uses startWithTarget to execute the action</span></span><br><span class="line">        <span class="comment">/* 对于瞬时动作需要减少一次 */</span></span><br><span class="line">        <span class="comment">/* 由于step肯定会先执行一次 */</span></span><br><span class="line">        <span class="keyword">if</span> (_actionInstant) &#123;</span><br><span class="line">            _times -=<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        _total = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Repeat::startWithTarget(Node *target)</span><br><span class="line">&#123;</span><br><span class="line">    _total = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 计算每个重复动作所占比率 */</span></span><br><span class="line">    _nextDt = _innerAction-&gt;getDuration()/_duration;</span><br><span class="line"></span><br><span class="line">    ActionInterval::startWithTarget(target);</span><br><span class="line">    _innerAction-&gt;startWithTarget(target);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<p><code>update</code>函数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Repeat::update(<span class="keyword">float</span> dt)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (dt &gt;= _nextDt) &#123;</span><br><span class="line">        <span class="comment">/* 之所以是循环，主要是为了瞬时动作 */</span></span><br><span class="line">        <span class="keyword">while</span> (dt &gt; _nextDt &amp;&amp; _total &lt; _times) &#123;</span><br><span class="line">            _innerAction-&gt;update(<span class="number">1.0f</span>);</span><br><span class="line">            _total++;</span><br><span class="line"></span><br><span class="line">            _innerAction-&gt;stop();</span><br><span class="line">            _innerAction-&gt;startWithTarget(_target);</span><br><span class="line">            _nextDt += _innerAction-&gt;getDuration()/_duration;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 对于最后一次退出循环的问题 */</span></span><br><span class="line">        <span class="keyword">if</span>(dt &gt;= <span class="number">1.0f</span> &amp;&amp; _total &lt; _times) &#123;</span><br><span class="line">            _total++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// don't set an instant action back or update it, it has no use because it has no duration</span></span><br><span class="line">        <span class="keyword">if</span> (!_actionInstant) &#123;</span><br><span class="line">            <span class="keyword">if</span> (_total == _times) &#123;</span><br><span class="line">                _innerAction-&gt;update(<span class="number">1</span>);</span><br><span class="line">                _innerAction-&gt;stop();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// issue #390 prevent jerk, use right update</span></span><br><span class="line">                _innerAction-&gt;update(dt - (_nextDt - _innerAction-&gt;getDuration()/_duration));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* 对于延时动作的update */</span></span><br><span class="line">        _innerAction-&gt;update(fmodf(dt * _times,<span class="number">1.0f</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="RepeatForever"><a href="#RepeatForever" class="headerlink" title="RepeatForever"></a>RepeatForever</h3><h3 id="Spawn"><a href="#Spawn" class="headerlink" title="Spawn"></a>Spawn</h3><h2 id="u603B_u7ED3"><a href="#u603B_u7ED3" class="headerlink" title="总结"></a>总结</h2>	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2015/01/07/cocos-event-dispatcher/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/12/18/cocos-ccactioninstant/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

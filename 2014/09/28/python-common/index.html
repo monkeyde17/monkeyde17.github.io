@@ -1,0 +1,226 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Python 公共库分析 ---- 杂七杂八 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="前几日写了一个的批量打包的工具apkpacker，然后便去看了看cocos-console的实现，自然就对Python这一语言产生了兴趣。但是之前只是学了简单的语法，没有具体深入学习，以至于连一些公共库都不是很熟悉，所以这篇文章就当做初学Python的笔记吧。
+看这个公共库的东西嘛，绝逼是要去pyt">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Python 公共库分析 ---- 杂七杂八"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">Python 公共库分析 ---- 杂七杂八</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-09-28</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p>前几日写了一个的批量打包的工具<code>apkpacker</code>，然后便去看了看<a href="/../../2014-09-25/cocos-console/">cocos-console</a>的实现，自然就对<code>Python</code>这一语言产生了兴趣。<br>但是之前只是学了简单的语法，没有具体深入学习，以至于连一些公共库都不是很熟悉，所以这篇文章就当做初学<code>Python</code>的笔记吧。</p>
+<p>看这个公共库的东西嘛，绝逼是要去<a href="https://docs.python.org/2/" target="_blank" rel="external">python.org</a>去看的</p>
+<h2 id="subprocess"><a href="#subprocess" class="headerlink" title="subprocess"></a>subprocess</h2><p><a href="https://docs.python.org/2/library/subprocess.html" target="_blank" rel="external">==传送门==</a></p>
+<p><code>subprogress</code>是产生子进程的，可以连接到标准输入，标准输出和标准错误管道，并且可以获得返回码。这个模块主要是为了替代以下几个模块：</p>
+<ul>
+<li>os.system</li>
+<li>os.spawn*</li>
+<li>os.popen*</li>
+<li>popen2.*</li>
+<li>commands.*</li>
+</ul>
+<h3 id="u7528_u6CD5"><a href="#u7528_u6CD5" class="headerlink" title="用法"></a>用法</h3><h4 id="subprocess-call"><a href="#subprocess-call" class="headerlink" title="subprocess.call"></a>subprocess.call</h4><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># subprocess.call(args, *, stdin=None, stdout=None, stderr=None, shell=False)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用列表作为参数</span></span><br><span class="line">subprocess.call([<span class="string">"ls"</span>, <span class="string">"-l"</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用字符串作为参数，还需指定shell=True</span></span><br><span class="line">subprocess.call(<span class="string">"exit 1"</span>, shell=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure>
+<p>前两个是命令参数，然后标准输入，标准输出，标准错误的制定，最后是表明是否一个<code>终端命令</code>(<strong>这个词呢，是我临时起的=。=</strong>)<br>当使用了<code>shell=True</code>这个参数，需要使用<code>一整个字符串</code>，而不是一个表来运行子进程。Python是以这个字符作为参数来运行shell。</p>
+<p><em>文档提示说使用<code>shell=True</code>会有安全隐患。具体慢慢往下看吧。</em></p>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+			
+		
+	
+		
+	
+		
+	
+	
+	
+		<li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next disabled"><a>next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

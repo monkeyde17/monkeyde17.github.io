@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- ActionManager | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="ActionManager动作管理类，在盘古开天之际就被Scheduler撸去变成了一个定时任务。 详见Director::init()
+路径122d/actions/CCActionManager.h2d/actions/CCActionManager.cpp
+源码分析其实和Scheduler的实">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- ActionManager"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- ActionManager</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-12-18</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p>ActionManager动作管理类，在盘古开天之际就被Scheduler撸去变成了一个定时任务。 <a href="/2014-11-24/cocos-ccdirector/">详见Director::init()</a></p>
+<h2 id="u8DEF_u5F84"><a href="#u8DEF_u5F84" class="headerlink" title="路径"></a>路径</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2</span>d/actions/CCActionManager.h</span><br><span class="line"><span class="number">2</span>d/actions/CCActionManager.cpp</span><br></pre></td></tr></table></figure>
+<h2 id="u6E90_u7801_u5206_u6790"><a href="#u6E90_u7801_u5206_u6790" class="headerlink" title="源码分析"></a>源码分析</h2><p>其实和Scheduler的实现有些类似 – <a href="/2014-12-12/cocos-ccscheduler/">cocos2dx 3.0 —- Scheduler</a></p>
+<h3 id="tHashElement"><a href="#tHashElement" class="headerlink" title="tHashElement"></a>tHashElement</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> _hashElement</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">struct</span> _ccArray    *actions;</span><br><span class="line">    Node               *target;</span><br><span class="line">    <span class="keyword">int</span>                actionIndex;</span><br><span class="line">    Action             *currentAction;</span><br><span class="line">    <span class="keyword">bool</span>               currentActionSalvaged;</span><br><span class="line">    <span class="keyword">bool</span>               paused;</span><br><span class="line">    UT_hash_handle     hh;</span><br><span class="line">&#125; tHashElement;</span><br></pre></td></tr></table></figure>
+<p>从结构体上看不出什么特别的，就是类似于Scheduler中的全局定时列表。</p>
+<h3 id="mainloop"><a href="#mainloop" class="headerlink" title="mainloop"></a>mainloop</h3><p>由于和Scheduler十分类似，这里就直接贴上主循环update函数，其他自行查看。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> ActionManager::update(<span class="keyword">float</span> dt)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (tHashElement *elt = _targets; elt != <span class="literal">nullptr</span>; ) &#123;</span><br><span class="line">        _currentTarget = elt;</span><br><span class="line">        _currentTargetSalvaged = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (! _currentTarget-&gt;paused) &#123;</span><br><span class="line">            <span class="comment">/* actions 数组可能在循环中改变 */</span></span><br><span class="line">            <span class="keyword">for</span> (_currentTarget-&gt;actionIndex = <span class="number">0</span>; _currentTarget-&gt;actionIndex &lt; _currentTarget-&gt;actions-&gt;num;</span><br><span class="line">                    _currentTarget-&gt;actionIndex++) &#123;</span><br><span class="line">                _currentTarget-&gt;currentAction = (Action*)_currentTarget-&gt;actions-&gt;arr[_currentTarget-&gt;actionIndex];</span><br><span class="line">                <span class="keyword">if</span> (_currentTarget-&gt;currentAction == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                _currentTarget-&gt;currentActionSalvaged = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">                <span class="comment">/* 这里是step */</span></span><br><span class="line">                _currentTarget-&gt;currentAction-&gt;step(dt);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (_currentTarget-&gt;currentActionSalvaged) &#123;</span><br><span class="line">                    <span class="comment">/* 已经被标记为回收状态，则可以调用 release */</span></span><br><span class="line">                    _currentTarget-&gt;currentAction-&gt;release();</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (_currentTarget-&gt;currentAction-&gt;isDone()) &#123;</span><br><span class="line">                        _currentTarget-&gt;currentAction-&gt;stop();</span><br><span class="line"></span><br><span class="line">                        Action *action = _currentTarget-&gt;currentAction;</span><br><span class="line">                        <span class="comment">/* 将_currentTarget置为空，防止一出action的时候回收 */</span></span><br><span class="line">                        _currentTarget-&gt;currentAction = <span class="literal">nullptr</span>;</span><br><span class="line">                        removeAction(action);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                _currentTarget-&gt;currentAction = <span class="literal">nullptr</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// elt, at this moment, is still valid</span></span><br><span class="line">        <span class="comment">// so it is safe to ask this here (issue #490)</span></span><br><span class="line">        elt = (tHashElement*)(elt-&gt;hh.next);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 当前对象所有的Action都结束的时候，才把当前对象从hash表中删除 */</span></span><br><span class="line">        <span class="keyword">if</span> (_currentTargetSalvaged &amp;&amp; _currentTarget-&gt;actions-&gt;num == <span class="number">0</span>) &#123;</span><br><span class="line">            deleteHashElement(_currentTarget);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// issue #635</span></span><br><span class="line">    _currentTarget = <span class="literal">nullptr</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>step</code>是在Action中的一个虚函数。具体键Action吧 – <a href="/2014-12-17/cocos-ccaction">cocos2dx 3.0 —- Action</a></p>
+<h2 id="u603B_u7ED3"><a href="#u603B_u7ED3" class="headerlink" title="总结"></a>总结</h2><p>ActionManager调用Action的流程：</p>
+<ol>
+<li>在addAction中，先是调用Action::startWithTarget</li>
+<li>在update中每一帧调用step函数，直到Action结束</li>
+</ol>
+<hr>
+<blockquote>
+<ol>
+<li>在step函数中有可能调用isDone，stop</li>
+<li>在removeAction中只是将Action标记为待回收（currentActionSalvaged = true）</li>
+</ol>
+</blockquote>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/12/18/cocos-ccactioninstant/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/12/17/cocos-ccaction/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

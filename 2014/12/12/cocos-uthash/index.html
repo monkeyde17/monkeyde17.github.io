@@ -1,0 +1,390 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- uthash | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="资料cocos2dx 里面有很多东西是直接从github上搞过来的，这个自然也是。为了更好的理解Scheduler，我还是仔细看看uthash的实现吧！
+http://troydhanson.github.io/uthash/https://github.com/troydhanson/uthash">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- uthash"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- uthash</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-12-12</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <h2 id="u8D44_u6599"><a href="#u8D44_u6599" class="headerlink" title="资料"></a>资料</h2><p>cocos2dx 里面有很多东西是直接从github上搞过来的，这个自然也是。<br>为了更好的理解Scheduler，我还是仔细看看uthash的实现吧！</p>
+<p><a href="http://troydhanson.github.io/uthash/" target="_blank" rel="external">http://troydhanson.github.io/uthash/</a><br><a href="https://github.com/troydhanson/uthash" target="_blank" rel="external">https://github.com/troydhanson/uthash</a></p>
+<h2 id="u8DEF_u5F84"><a href="#u8DEF_u5F84" class="headerlink" title="路径"></a>路径</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2</span>d/support/data-support/uthash.h</span><br></pre></td></tr></table></figure>
+<h2 id="u7528_u6CD5"><a href="#u7528_u6CD5" class="headerlink" title="用法"></a>用法</h2><p>现在的话，先是了解如何使用。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span>   /* gets */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span>  /* atoi, malloc */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span>  /* strcpy */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">"uthash.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> my_struct &#123;</span><br><span class="line">    <span class="keyword">int</span> id;                    <span class="comment">/* 键值 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> name[<span class="number">10</span>];</span><br><span class="line"></span><br><span class="line">    UT_hash_handle hh;         <span class="comment">/* 关键结构体 */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> my_struct *users = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">add_user</span><span class="params">(<span class="keyword">int</span> user_id, <span class="keyword">char</span> *name)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> my_struct *s;</span><br><span class="line"></span><br><span class="line">    HASH_FIND_INT(users, &amp;user_id, s);  <span class="comment">/* id already in the hash? */</span></span><br><span class="line">    <span class="keyword">if</span> (s==<span class="literal">NULL</span>) &#123;</span><br><span class="line">        s = (<span class="keyword">struct</span> my_struct*)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> my_struct));</span><br><span class="line">        s-&gt;id = user_id;</span><br><span class="line">        HASH_ADD_INT( users, id, s );  <span class="comment">/* id: name of key field */</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">strcpy</span>(s-&gt;name, name);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">struct</span> my_struct *<span class="title">find_user</span><span class="params">(<span class="keyword">int</span> user_id)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> my_struct *s;</span><br><span class="line"></span><br><span class="line">    HASH_FIND_INT( users, &amp;user_id, s );  <span class="comment">/* s: output pointer */</span></span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">delete_user</span><span class="params">(<span class="keyword">struct</span> my_struct *user)</span> </span>&#123;</span><br><span class="line">    HASH_DEL( users, user);  <span class="comment">/* user: pointer to deletee */</span></span><br><span class="line">    <span class="built_in">free</span>(user);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">delete_all</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> my_struct *current_user, *tmp;</span><br><span class="line"></span><br><span class="line">    HASH_ITER(hh, users, current_user, tmp) &#123;</span><br><span class="line">        HASH_DEL(users,current_user);  <span class="comment">/* delete it (users advances to next) */</span></span><br><span class="line">        <span class="built_in">free</span>(current_user);            <span class="comment">/* free it */</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print_users</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> my_struct *s;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(s=users; s != <span class="literal">NULL</span>; s=(<span class="keyword">struct</span> my_struct*)(s-&gt;hh.next)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"user id %d: name %s\n"</span>, s-&gt;id, s-&gt;name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">name_sort</span><span class="params">(<span class="keyword">struct</span> my_struct *a, <span class="keyword">struct</span> my_struct *b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">strcmp</span>(a-&gt;name,b-&gt;name);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">id_sort</span><span class="params">(<span class="keyword">struct</span> my_struct *a, <span class="keyword">struct</span> my_struct *b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (a-&gt;id - b-&gt;id);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sort_by_name</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    HASH_SORT(users, name_sort);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sort_by_id</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    HASH_SORT(users, id_sort);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="keyword">char</span> in[<span class="number">10</span>];</span><br><span class="line">    <span class="keyword">int</span> id=<span class="number">1</span>, running=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">struct</span> my_struct *s;</span><br><span class="line">    <span class="keyword">unsigned</span> num_users;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (running) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">" 1. add user\n"</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">" 2. add/rename user by id\n"</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">" 3. find user\n"</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">" 4. delete user\n"</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">" 5. delete all users\n"</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">" 6. sort items by name\n"</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">" 7. sort items by id\n"</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">" 8. print users\n"</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">" 9. count users\n"</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"10. quit\n"</span>);</span><br><span class="line">        gets(in);</span><br><span class="line">        <span class="keyword">switch</span>(atoi(in)) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"name?\n"</span>);</span><br><span class="line">                add_user(id++, gets(in));</span><br><span class="line">                <span class="keyword">break</span>;  </span><br><span class="line">            <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"id?\n"</span>);</span><br><span class="line">                gets(in); id = atoi(in);</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"name?\n"</span>);</span><br><span class="line">                add_user(id, gets(in));</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"id?\n"</span>);</span><br><span class="line">                s = find_user(atoi(gets(in)));</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"user: %s\n"</span>, s ? s-&gt;name : <span class="string">"unknown"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">4</span>:</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"id?\n"</span>);</span><br><span class="line">                s = find_user(atoi(gets(in)));</span><br><span class="line">                <span class="keyword">if</span> (s) delete_user(s);</span><br><span class="line">                <span class="keyword">else</span> <span class="built_in">printf</span>(<span class="string">"id unknown\n"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">                delete_all();</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">6</span>:</span><br><span class="line">                sort_by_name();</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">7</span>:</span><br><span class="line">                sort_by_id();</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">8</span>:</span><br><span class="line">                print_users();</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">9</span>:</span><br><span class="line">                num_users=HASH_COUNT(users);</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">"there are %u users\n"</span>, num_users);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">10</span>:</span><br><span class="line">                running=<span class="number">0</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    delete_all();  <span class="comment">/* free any structures */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个uthash User Guide的一个例子，说明了插入查找删除应该如何如何。</p>
+<h2 id="u5B8F_u5217_u8868"><a href="#u5B8F_u5217_u8868" class="headerlink" title="宏列表"></a>宏列表</h2><h3 id="u4FBF_u6377_u5B8F"><a href="#u4FBF_u6377_u5B8F" class="headerlink" title="便捷宏"></a>便捷宏</h3><p>这个<code>便捷宏</code>其实是对<a href="/./#通用宏">通用宏</a>的再次封装。所以要求就来了：</p>
+<ul>
+<li><code>UT_hash_handle</code>在自定义结构体中的名字必须是<code>hh</code></li>
+<li>键的类型只能是<code>int</code>，<code>char[]</code>和<code>void*(指针)</code></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>宏</th>
+<th>参数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HASH_ADD_INT</td>
+<td>(head, keyfield_name, item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_REPLACE_INT</td>
+<td>(head, keyfiled_name, item_ptr, replaced_item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_FIND_INT</td>
+<td>(head, key_ptr, item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_ADD_STR</td>
+<td>(head, keyfield_name, item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_REPLACE_STR</td>
+<td>(head, keyfield_name, item_ptr, replaced_item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_FIND_STR</td>
+<td>(head, key_ptr, item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_ADD_PTR</td>
+<td>(head, keyfield_name, item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_REPLACE_PTR</td>
+<td>(head, keyfield_name, item_ptr, replaced_item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_FIND_PTR</td>
+<td>(head, key_ptr, item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_DEL</td>
+<td>(head, item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_SORT</td>
+<td>(head, cmp)</td>
+</tr>
+<tr>
+<td>HASH_COUNT</td>
+<td>(head)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="u901A_u7528_u5B8F"><a href="#u901A_u7528_u5B8F" class="headerlink" title="通用宏"></a>通用宏</h3><p>这些<code>通用宏</code>只建议在需要制定非<code>int</code>，<code>char[]</code>的键值的时候使用。</p>
+<table>
+<thead>
+<tr>
+<th>宏</th>
+<th>参数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HASH_ADD</td>
+<td>(hh_name, head, keyfield_name, key_len, item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_ADD_KEYPTR</td>
+<td>(hh_name, head, key_ptr, key_len, item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_REPLACE</td>
+<td>(hh_name, head, keyfield_name, key_len, item_ptr, replaced_item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_FIND</td>
+<td>(hh_name, head, key_ptr, key_len, item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_DELETE</td>
+<td>(hh_name, head, item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_SRT</td>
+<td>(hh_name, head, cmp)</td>
+</tr>
+<tr>
+<td>HASH_CNT</td>
+<td>(hh_name, head)</td>
+</tr>
+<tr>
+<td>HASH_CLEAR</td>
+<td>(hh_name, head)</td>
+</tr>
+<tr>
+<td>HASH_SELECT</td>
+<td>(dst_hh_name, dst_head, src_hh_name, src_head, condition)</td>
+</tr>
+<tr>
+<td>HASH_ITER</td>
+<td>(hh_name, head, item_ptr, tmp_item_ptr)</td>
+</tr>
+<tr>
+<td>HASH_OVERHEAD</td>
+<td>(hh_name, head)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="u53C2_u6570_u8BF4_u660E"><a href="#u53C2_u6570_u8BF4_u660E" class="headerlink" title="参数说明"></a>参数说明</h3><h4 id="hh_name"><a href="#hh_name" class="headerlink" title="hh_name"></a>hh_name</h4><p>在结构体中<code>UT_hash_handle</code>的结构体成员名字。若使用<code>便捷宏</code>默认是hh</p>
+<h4 id="head"><a href="#head" class="headerlink" title="head"></a>head</h4><p>结构体头指针变量名</p>
+<h4 id="keyfield_name"><a href="#keyfield_name" class="headerlink" title="keyfield_name"></a>keyfield_name</h4><p>在结构体中的键的实体名</p>
+<h4 id="key_len"><a href="#key_len" class="headerlink" title="key_len"></a>key_len</h4><p>键的长度，若键值是<code>int</code>，则为<code>sizeof(int)</code>，若为<code>str</code>，则为<code>strlen(str)</code></p>
+<h4 id="key_ptr"><a href="#key_ptr" class="headerlink" title="key_ptr"></a>key_ptr</h4><p>在HASH_FIND中，这是待查找的实体的一个指向<code>结构体的键的类型</code>的指针，<br>在HASH_ADD_KEYPTR中，需要这是一个<code>结构体中键的类型</code>的地址</p>
+<h4 id="item_ptr"><a href="#item_ptr" class="headerlink" title="item_ptr"></a>item_ptr</h4><p>指向那些待查找、添加、删除的结构体的指针。或者是当前迭代器的指针。<br>该参数作为<code>HASH_ADD</code>、<code>HASH_DELETE</code>的输入，作为<code>HASH_FIND</code>、<code>HASH_ITER</code>的输出。</p>
+<h4 id="replaced_item_ptr"><a href="#replaced_item_ptr" class="headerlink" title="replaced_item_ptr"></a>replaced_item_ptr</h4><p>在使用HASH_REPLACE的时候，作为一个输出参数，指向替换的内容的指针。</p>
+<h4 id="cmp"><a href="#cmp" class="headerlink" title="cmp"></a>cmp</h4><p>比较函数指针，其中是用到了<code>mergesort</code>排序</p>
+<h4 id="condition"><a href="#condition" class="headerlink" title="condition"></a>condition</h4><p>传入一个宏或者函数指针，接受一个指向结构体的void*指针<br>这个宏或函数需要判断当前结构体是否符合select的条件，根据结果返回一个非零值。</p>
+<hr>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/12/17/cocos-ccaction/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/12/12/cocos-cccarray/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- Scheduler | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="涉及到以下东西：
+
+ccCArray
+uthash
+utlist
+
+
+
+_listEntry (tListEntry)
+
+12345678910/* 用于全局的定时器 */typedef struct _listEntry&amp;#123;    struct _listEntry   *prev, *n">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- Scheduler"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- Scheduler</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-12-12</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p>涉及到以下东西：</p>
+<ul>
+<li><a href="/2014-12-12/cocos-cccarray">ccCArray</a></li>
+<li><a href="/2014-12-12/cocos-uthash">uthash</a></li>
+<li><a href="/">utlist</a></li>
+</ul>
+<hr>
+<ul>
+<li><code>_listEntry (tListEntry)</code></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 用于全局的定时器 */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> _listEntry</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">struct</span> _listEntry   *prev, *next;       <span class="comment">// 双向链表 </span></span><br><span class="line">    ccSchedulerFunc     callback;           <span class="comment">// 回调函数</span></span><br><span class="line">    <span class="keyword">void</span>                *target;            <span class="comment">// 对象</span></span><br><span class="line">    <span class="keyword">int</span>                 priority;           <span class="comment">// 优先级</span></span><br><span class="line">    <span class="keyword">bool</span>                paused;             <span class="comment">// 是否暂停</span></span><br><span class="line">    <span class="keyword">bool</span>                markedForDeletion;  <span class="comment">// 当这个被标记为ture的时候，这个selector在下个周期时间就会被停止</span></span><br><span class="line">&#125; tListEntry;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>_hashUpdateEntry (tHashUpdateEntry)</code></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 全局定时器的hash */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> _hashUpdateEntry</span><br><span class="line">&#123;</span><br><span class="line">    tListEntry          **<span class="built_in">list</span>;             <span class="comment">// 在哪个链表中</span></span><br><span class="line">    tListEntry          *entry;             <span class="comment">// 定时器 </span></span><br><span class="line">    <span class="keyword">void</span>                *target;            <span class="comment">// 对象，键值</span></span><br><span class="line">    ccSchedulerFunc     callback;           <span class="comment">// 回调函数</span></span><br><span class="line">    UT_hash_handle      hh;                 <span class="comment">// uthash内置结构体</span></span><br><span class="line">&#125; tHashUpdateEntry;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>_hashSelectorEntry (tHastTimeEntry)</code></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> _hashSelectorEntry</span><br><span class="line">&#123;</span><br><span class="line">    ccArray             *timers;                <span class="comment">// 计时器数组</span></span><br><span class="line">    <span class="keyword">void</span>                *target;                <span class="comment">// 对象，键值</span></span><br><span class="line">    <span class="keyword">int</span>                 timerIndex;             <span class="comment">// 定时器索引</span></span><br><span class="line">    Timer               *currentTimer;          <span class="comment">// 当前定时器</span></span><br><span class="line">    <span class="keyword">bool</span>                currentTimerSalvaged;   <span class="comment">// 是否被回收利用</span></span><br><span class="line">    <span class="keyword">bool</span>                paused;                 <span class="comment">// 是否暂停</span></span><br><span class="line">    UT_hash_handle      hh;                     <span class="comment">// uthash内置结构体</span></span><br><span class="line">&#125; tHashTimerEntry;</span><br></pre></td></tr></table></figure>
+<p>对于名字不统一的解释：</p>
+<ul>
+<li>_hashSelectorEntry 给 TimerTargetSelector</li>
+<li>tHashTimerEntry 给 TimerTargetCallback</li>
+</ul>
+<p>由于该结构体的计时器数组<code>timers</code>是保存着Ref*的数组，所以可以根据需要把timers中的元素强制转换成相应类型。</p>
+<hr>
+<ul>
+<li>Timer (TimerTargetSelector, TimerTargetCallback, 脚本)</li>
+<li>Scheduler</li>
+</ul>
+<h2 id="u8DEF_u5F84"><a href="#u8DEF_u5F84" class="headerlink" title="路径"></a>路径</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2</span>d/CCScheduler.h</span><br><span class="line"><span class="number">2</span>d/CCScheduler.cpp</span><br></pre></td></tr></table></figure>
+<h2 id="u6E90_u7801_u5206_u6790"><a href="#u6E90_u7801_u5206_u6790" class="headerlink" title="源码分析"></a>源码分析</h2><p>我们需要先引用两个东西，详细可见<a href="/2014-12-10/cocos-ccmacros">cocos2dx 3.0 – Macros</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* cpp11 回调函数 */</span></span><br><span class="line"><span class="comment">/* 2d/CCScheduler.h */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(<span class="keyword">float</span>)&gt; ccSchedulerFunc;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 函数指针 */</span></span><br><span class="line"><span class="comment">/* base/CCRef.h */</span></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(Ref::*SEL_SCHEDULE)</span><span class="params">(<span class="keyword">float</span>)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>成员变量：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> CC_DLL Scheduler : <span class="keyword">public</span> Ref</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">        </span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这让我想起来子弹时间 */</span></span><br><span class="line">    <span class="keyword">float</span> _timeScale;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*****************************************/</span></span><br><span class="line">    <span class="comment">/* 全局定时器任务列表，按照优先级分为3类 */</span></span><br><span class="line">    <span class="comment">/*****************************************/</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">struct</span> _listEntry *_updatesNegList;         <span class="comment">// 优先级小于 0</span></span><br><span class="line">    <span class="keyword">struct</span> _listEntry *_updates0List;           <span class="comment">// 优先级等于 0</span></span><br><span class="line">    <span class="keyword">struct</span> _listEntry *_updatesPosList;         <span class="comment">// 优先级大于 0</span></span><br><span class="line">    <span class="keyword">struct</span> _hashUpdateEntry *_hashForUpdates;   <span class="comment">// 用于快速查找上述三个列表的hash表</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 自定义selector */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">struct</span> _hashSelectorEntry *_hashForTimers;  <span class="comment">// 自定义定定时器任务</span></span><br><span class="line">    <span class="keyword">struct</span> _hashSelectorEntry *_currentTarget;  <span class="comment">// 当前遍历到的</span></span><br><span class="line">    <span class="keyword">bool</span> _currentTargetSalvaged;                <span class="comment">// 是否要回收利用？</span></span><br><span class="line">    <span class="keyword">bool</span> _updateHashLocked;                     <span class="comment">// 如果为true则不能从hash删除任何元素，只会被标记成待删除。</span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">if</span> CC_ENABLE_SCRIPT_BINDING</span></span><br><span class="line">    Vector&lt;SchedulerScriptHandlerEntry*&gt; _scriptHandlerEntries;</span><br><span class="line"><span class="preprocessor">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Used for "perform Function"</span></span><br><span class="line">    <span class="comment">/* 这里是接受从其他线程回调函数 */</span></span><br><span class="line">    <span class="comment">/* 这里的回调函数没有参数和返回值 */</span></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::function&lt;<span class="keyword">void</span>()&gt;&gt; _functionsToPerform; <span class="comment">// 回调函数数组</span></span><br><span class="line">    <span class="built_in">std</span>::mutex _performMutex; <span class="comment">// 互斥锁</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<hr>
+<p>接着我们来看看主循环:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Scheduler::update(<span class="keyword">float</span> dt)</span><br><span class="line">&#123;</span><br><span class="line">    _updateHashLocked = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (_timeScale != <span class="number">1.0f</span>) &#123;</span><br><span class="line">        dt *= _timeScale;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    tListEntry *entry, *tmp;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/********************************/</span></span><br><span class="line">    <span class="comment">/* 先对全局的定时器进行一次调用 */</span></span><br><span class="line">    <span class="comment">/********************************/</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 优先级小于 0 */</span></span><br><span class="line">    DL_FOREACH_SAFE(_updatesNegList, entry, tmp) &#123;</span><br><span class="line">        <span class="keyword">if</span> ((! entry-&gt;paused) &amp;&amp; (! entry-&gt;markedForDeletion)) &#123;</span><br><span class="line">            entry-&gt;callback(dt);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 优先级等于 0 */</span></span><br><span class="line">    DL_FOREACH_SAFE(_updates0List, entry, tmp) &#123;</span><br><span class="line">        <span class="keyword">if</span> ((! entry-&gt;paused) &amp;&amp; (! entry-&gt;markedForDeletion)) &#123;</span><br><span class="line">            entry-&gt;callback(dt);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 优先级大于 0 */</span></span><br><span class="line">    DL_FOREACH_SAFE(_updatesPosList, entry, tmp) &#123;</span><br><span class="line">        <span class="keyword">if</span> ((! entry-&gt;paused) &amp;&amp; (! entry-&gt;markedForDeletion)) &#123;</span><br><span class="line">            entry-&gt;callback(dt);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 遍历所有带有定时器的对象 */</span></span><br><span class="line">    <span class="keyword">for</span> (tHashTimerEntry *elt = _hashForTimers; elt != <span class="literal">nullptr</span>; ) &#123;</span><br><span class="line">        _currentTarget = elt;</span><br><span class="line">        _currentTargetSalvaged = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (! _currentTarget-&gt;paused) &#123;</span><br><span class="line">            <span class="comment">/* timers 数组可能在循环中改变 */</span></span><br><span class="line">            <span class="comment">/* 遍历该对象的所有定时器 */</span></span><br><span class="line">            <span class="keyword">for</span> (elt-&gt;timerIndex = <span class="number">0</span>; elt-&gt;timerIndex &lt; elt-&gt;timers-&gt;num; ++(elt-&gt;timerIndex))</span><br><span class="line">            &#123;</span><br><span class="line">                elt-&gt;currentTimer = (Timer*)(elt-&gt;timers-&gt;arr[elt-&gt;timerIndex]);</span><br><span class="line">                elt-&gt;currentTimerSalvaged = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">                <span class="comment">/* 执行一次 update 操作 */</span></span><br><span class="line">                elt-&gt;currentTimer-&gt;update(dt);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (elt-&gt;currentTimerSalvaged)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// The currentTimer told the remove itself. To prevent the timer from</span></span><br><span class="line">                    <span class="comment">// accidentally deallocating itself before finishing its step, we retained</span></span><br><span class="line">                    <span class="comment">// it. Now that step is done, it's safe to release it.</span></span><br><span class="line">                    elt-&gt;currentTimer-&gt;release();</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                elt-&gt;currentTimer = <span class="literal">nullptr</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// elt, at this moment, is still valid</span></span><br><span class="line">        <span class="comment">// so it is safe to ask this here (issue #490)</span></span><br><span class="line">        elt = (tHashTimerEntry *)elt-&gt;hh.next;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// only delete currentTarget if no actions were scheduled during the cycle (issue #481)</span></span><br><span class="line">        <span class="keyword">if</span> (_currentTargetSalvaged &amp;&amp; _currentTarget-&gt;timers-&gt;num == <span class="number">0</span>) &#123;</span><br><span class="line">            removeHashElement(_currentTarget);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/****************************************/</span></span><br><span class="line">    <span class="comment">/* 将全局定时器中标记为待删除的给删除了 */</span></span><br><span class="line">    <span class="comment">/****************************************/</span></span><br><span class="line"></span><br><span class="line">    DL_FOREACH_SAFE(_updatesNegList, entry, tmp) &#123;</span><br><span class="line">        <span class="keyword">if</span> (entry-&gt;markedForDeletion) &#123;</span><br><span class="line">            <span class="keyword">this</span>-&gt;removeUpdateFromHash(entry);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    DL_FOREACH_SAFE(_updates0List, entry, tmp) &#123;</span><br><span class="line">        <span class="keyword">if</span> (entry-&gt;markedForDeletion) &#123;</span><br><span class="line">            <span class="keyword">this</span>-&gt;removeUpdateFromHash(entry);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    DL_FOREACH_SAFE(_updatesPosList, entry, tmp) &#123;</span><br><span class="line">        <span class="keyword">if</span> (entry-&gt;markedForDeletion) &#123;</span><br><span class="line">            <span class="keyword">this</span>-&gt;removeUpdateFromHash(entry);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    _updateHashLocked = <span class="literal">false</span>;</span><br><span class="line">    _currentTarget = <span class="literal">nullptr</span>;</span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">if</span> CC_ENABLE_SCRIPT_BINDING</span></span><br><span class="line">    <span class="comment">/* 略去脚本相关 */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 从其他线程来的 */</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span>( !_functionsToPerform.empty() ) &#123;</span><br><span class="line">        _performMutex.lock();</span><br><span class="line">        <span class="keyword">auto</span> temp = _functionsToPerform;</span><br><span class="line">        _functionsToPerform.clear();</span><br><span class="line">        _performMutex.unlock();</span><br><span class="line">        <span class="comment">/* 函数调用必须在unlock之后 */</span></span><br><span class="line">        <span class="keyword">for</span>( <span class="keyword">const</span> <span class="keyword">auto</span> &amp;function : temp ) &#123;</span><br><span class="line">            function();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以把Scheduler分成3部分：</p>
+<ul>
+<li>系统级定时器，_updatesNegList，_updates0List，_updatesPosList</li>
+<li>自定义定时器，TimerTargetCallback，TimerTargetSelector</li>
+<li>其他线程的函数，_functionsToPerform</li>
+</ul>
+<h3 id="Selector"><a href="#Selector" class="headerlink" title="Selector"></a>Selector</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">scheduleUpdate</span><span class="params">(T *target, <span class="keyword">int</span> priority, <span class="keyword">bool</span> paused)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>-&gt;schedulePerFrame([target](<span class="keyword">float</span> dt)&#123;</span><br><span class="line">        target-&gt;update(dt);</span><br><span class="line">    &#125;, target, priority, paused);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Scheduler::schedulePerFrame(<span class="keyword">const</span> ccSchedulerFunc&amp; callback, <span class="keyword">void</span> *target, <span class="keyword">int</span> priority, <span class="keyword">bool</span> paused)</span><br><span class="line">&#123;</span><br><span class="line">    tHashUpdateEntry *hashElement = <span class="literal">nullptr</span>;</span><br><span class="line">    HASH_FIND_PTR(_hashForUpdates, &amp;target, hashElement);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 若再待更新的hash表中没有找到 */</span></span><br><span class="line">    <span class="comment">/* 那么就不需要再去更新定时任务 */</span></span><br><span class="line">    <span class="keyword">if</span> (hashElement) &#123;</span><br><span class="line"><span class="preprocessor">#<span class="keyword">if</span> COCOS2D_DEBUG &gt;= <span class="number">1</span></span></span><br><span class="line">        CCASSERT(hashElement-&gt;entry-&gt;markedForDeletion,<span class="string">""</span>);</span><br><span class="line"><span class="preprocessor">#<span class="keyword">endif</span></span></span><br><span class="line">        hashElement-&gt;entry-&gt;markedForDeletion = <span class="literal">false</span>;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* appendIn是在链表尾部添加元素 */</span></span><br><span class="line">    <span class="comment">/* priorityIn是根据优先级插入链表中，使链表有序 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (priority == <span class="number">0</span>) &#123;</span><br><span class="line">        appendIn(&amp;_updates0List, callback, target, paused);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (priority &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        priorityIn(&amp;_updatesNegList, callback, target, priority, paused);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        priorityIn(&amp;_updatesPosList, callback, target, priority, paused);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<p><code>appendIn</code>和<code>priorityIn</code>的共同之处：</p>
+<ul>
+<li>将元素添加到列表之中</li>
+<li>更新_hashForUpdates这个hash表</li>
+</ul>
+<h3 id="Custom_Selector"><a href="#Custom_Selector" class="headerlink" title="Custom Selector"></a>Custom Selector</h3><p>自定义定时器任务有两种类型：</p>
+<ul>
+<li>c/c++ 函数指针 – SEL_SCHEDULE</li>
+<li>std::function  – ccSchedulerFunc</li>
+</ul>
+<h4 id="SEL_SCHEDULE"><a href="#SEL_SCHEDULE" class="headerlink" title="SEL_SCHEDULE"></a>SEL_SCHEDULE</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Scheduler::schedule(SEL_SCHEDULE selector, Ref *target, <span class="keyword">float</span> interval, <span class="keyword">unsigned</span> <span class="keyword">int</span> repeat, <span class="keyword">float</span> delay, <span class="keyword">bool</span> paused)</span><br><span class="line">&#123;</span><br><span class="line">    CCASSERT(target, <span class="string">"Argument target must be non-nullptr"</span>);</span><br><span class="line"></span><br><span class="line">    tHashTimerEntry *element = <span class="literal">nullptr</span>;</span><br><span class="line">    HASH_FIND_PTR(_hashForTimers, &amp;target, element);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 若没找到，新申请一个节点 */</span></span><br><span class="line">    <span class="keyword">if</span> (! element) &#123;</span><br><span class="line">        element = (tHashTimerEntry *)<span class="built_in">calloc</span>(<span class="keyword">sizeof</span>(*element), <span class="number">1</span>);</span><br><span class="line">        element-&gt;target = target;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 更新_hashForTimers哈希表 */</span></span><br><span class="line">        HASH_ADD_PTR(_hashForTimers, target, element);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Is this the 1st element ? Then set the pause level to all the selectors of this target</span></span><br><span class="line"></span><br><span class="line">        element-&gt;paused = paused;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        CCASSERT(element-&gt;paused == paused, <span class="string">""</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (element-&gt;timers == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">        <span class="comment">/* 若是这个对象的第一个定时器任务，则分配定时器任务数组 */</span></span><br><span class="line">        element-&gt;timers = ccArrayNew(<span class="number">10</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* 寻找是否有相同的定时器任务 */</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; element-&gt;timers-&gt;num; ++i) &#123;</span><br><span class="line">            TimerTargetSelector *timer = <span class="keyword">static_cast</span>&lt;TimerTargetSelector*&gt;(element-&gt;timers-&gt;arr[i]);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (selector == timer-&gt;getSelector()) &#123;</span><br><span class="line">                <span class="comment">/* 若找到直接返回 */</span></span><br><span class="line">                CCLOG(<span class="string">"CCScheduler#scheduleSelector. Selector already scheduled. Updating interval from: %.4f to %.4f"</span>, timer-&gt;getInterval(), interval);</span><br><span class="line">                timer-&gt;setInterval(interval);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">/* 否则，为这个定时器任务数组扩容 */</span></span><br><span class="line">        ccArrayEnsureExtraCapacity(element-&gt;timers, <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 将这个新的定时器任务加入定时器数组中 */</span></span><br><span class="line">    TimerTargetSelector *timer = <span class="keyword">new</span> TimerTargetSelector();</span><br><span class="line">    timer-&gt;initWithSelector(<span class="keyword">this</span>, selector, target, interval, repeat, delay);</span><br><span class="line">    ccArrayAppendObject(element-&gt;timers, timer);</span><br><span class="line">    <span class="comment">/* 由于上一句增加了一个引用计数，所以这里调用release */</span></span><br><span class="line">    timer-&gt;release();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Scheduler::schedule(SEL_SCHEDULE selector, Ref *target, <span class="keyword">float</span> interval, <span class="keyword">bool</span> paused)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">this</span>-&gt;schedule(selector, target, interval, kRepeatForever, <span class="number">0.0f</span>, paused);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">bool</span> Scheduler::isScheduled(SEL_SCHEDULE selector, Ref *target)</span><br><span class="line">&#123;</span><br><span class="line">    CCASSERT(selector, <span class="string">"Argument selector must be non-nullptr"</span>);</span><br><span class="line">    CCASSERT(target, <span class="string">"Argument target must be non-nullptr"</span>);</span><br><span class="line"></span><br><span class="line">    tHashTimerEntry *element = <span class="literal">nullptr</span>;</span><br><span class="line">    HASH_FIND_PTR(_hashForTimers, &amp;target, element);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 先查找这个对象是否在hash表中 */</span></span><br><span class="line">    <span class="keyword">if</span> (!element) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 然后查找这个对象的定时器任务数组里是否有这个任务 */</span></span><br><span class="line">    <span class="keyword">if</span> (element-&gt;timers == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; element-&gt;timers-&gt;num; ++i) &#123;</span><br><span class="line">            TimerTargetSelector *timer = <span class="keyword">static_cast</span>&lt;TimerTargetSelector*&gt;(element-&gt;timers-&gt;arr[i]);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (selector == timer-&gt;getSelector()) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 按照正常流程，不会执行到这步 */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Scheduler::unschedule(SEL_SCHEDULE selector, Ref *target)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (target == <span class="literal">nullptr</span> || selector == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 先在hash表中寻找是否有这个对象的定时器任务 */</span></span><br><span class="line">    tHashTimerEntry *element = <span class="literal">nullptr</span>;</span><br><span class="line">    HASH_FIND_PTR(_hashForTimers, &amp;target, element);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (element) &#123;</span><br><span class="line">        <span class="comment">/* 遍历这个对象的所有的定时器任务 */</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; element-&gt;timers-&gt;num; ++i) &#123;</span><br><span class="line">            TimerTargetSelector *timer = <span class="keyword">static_cast</span>&lt;TimerTargetSelector*&gt;(element-&gt;timers-&gt;arr[i]);</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* 若找到改定时器任务 */</span></span><br><span class="line">            <span class="keyword">if</span> (selector == timer-&gt;getSelector()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (timer == element-&gt;currentTimer &amp;&amp; (! element-&gt;currentTimerSalvaged)) &#123;</span><br><span class="line">                    <span class="comment">/* 防止被回收 */</span></span><br><span class="line">                    element-&gt;currentTimer-&gt;retain();</span><br><span class="line">                    element-&gt;currentTimerSalvaged = <span class="literal">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">/* 直接从定时器数组中删除改定时器任务 */</span></span><br><span class="line">                ccArrayRemoveObjectAtIndex(element-&gt;timers, i, <span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">                <span class="comment">/* 更新timerIndex */</span></span><br><span class="line">                <span class="comment">/* 保证timerIndex = i - 1 ? */</span></span><br><span class="line">                <span class="keyword">if</span> (element-&gt;timerIndex &gt;= i) &#123;</span><br><span class="line">                    element-&gt;timerIndex--;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">/* 若这个定时器任务是最后一个定时器任务 */</span></span><br><span class="line">                <span class="comment">/* 则从hash表中删除这个对象 */</span></span><br><span class="line">                <span class="keyword">if</span> (element-&gt;timers-&gt;num == <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="comment">/* 若当前对象和查找到的对象相同，则标记删除，等待下一个时间周期删除 */</span></span><br><span class="line">                    <span class="comment">/* 否则直接从hash表删除该对象 */</span></span><br><span class="line">                    <span class="keyword">if</span> (_currentTarget == element) &#123;</span><br><span class="line">                        _currentTargetSalvaged = <span class="literal">true</span>;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        removeHashElement(element);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="ccSchedulerFunc"><a href="#ccSchedulerFunc" class="headerlink" title="ccSchedulerFunc"></a>ccSchedulerFunc</h4><p>其实这个和SEL_SCHEDULE实现很类似，只是在对定时器任务的类型有所区别。由于实现相似，所以这里就不贴代码了。</p>
+<h3 id="Function"><a href="#Function" class="headerlink" title="Function"></a>Function</h3><p>这个部分就这么一小段代码，我看了下，cocos引擎里面自己是没有调用这个函数的。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> Scheduler::performFunctionInCocosThread(<span class="keyword">const</span> <span class="built_in">std</span>::function&lt;<span class="keyword">void</span> ()&gt; &amp;function)</span><br><span class="line">&#123;</span><br><span class="line">    _performMutex.lock();</span><br><span class="line">    _functionsToPerform.push_back(function);</span><br><span class="line">    _performMutex.unlock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="u603B_u7ED3"><a href="#u603B_u7ED3" class="headerlink" title="总结"></a>总结</h2><p>Scheduler的update函数是所有定时器任务，Action等等的最早的update。总结为以下三点：</p>
+<ul>
+<li>具有全局任务，每一帧更新 – 三个双向链表，和一个hash表。</li>
+<li>自定义任务，可以自定义时间间隔 – 一个<target, 定时器任务数组="">hash表</target,></li>
+<li>其他线程的函数 – 只能是void f()类型的函数</li>
+</ul>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/12/12/cocos-cccarray/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/12/11/cocos-ccvalue/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

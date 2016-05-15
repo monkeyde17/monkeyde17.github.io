@@ -1,0 +1,239 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>quick-cocos 2.2.3 -- 框架简析 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="前言近期接手了两个项目，都是quick-cocos 2.2.x写的。
+前期工作虽然之前都没有用quick写过项目，但是对cocos2dx中lua模块有所涉及，所以上手不算太难。之前听别人说直接用quick开发，不需要c/c++，其实感觉还是扯淡，我总不希望不明不白的用了一个东西。
+
+lua coco">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="quick-cocos 2.2.3 -- 框架简析"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">quick-cocos 2.2.3 -- 框架简析</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2015-01-30</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <h2 id="u524D_u8A00"><a href="#u524D_u8A00" class="headerlink" title="前言"></a>前言</h2><p>近期接手了两个项目，都是<code>quick-cocos 2.2.x</code>写的。</p>
+<h2 id="u524D_u671F_u5DE5_u4F5C"><a href="#u524D_u671F_u5DE5_u4F5C" class="headerlink" title="前期工作"></a>前期工作</h2><p>虽然之前都没有用quick写过项目，但是对cocos2dx中lua模块有所涉及，所以上手不算太难。<br>之前听别人说<code>直接用quick开发，不需要c/c++</code>，其实感觉还是扯淡，我总不希望不明不白的用了一个东西。</p>
+<ol>
+<li><p>lua<br> cocos还是用着lua5.1的版本，所以可以去看<a href="/">lua程序设计 第二版</a>，当然你也可以去看 lua5.2 和 lua5.3 的。<br> 然后就是关于lua5.1的c api部分，这块东西可以结合api说明文档和lua辅助库和tolua++一起看。</p>
+</li>
+<li><p>tolua++<br> 关于tolua++的源码，我完整的看过，而且给tolua++加上了中文注释 <a href="https://github.com/monkeyde17/et-tolua-comment" target="_blank" rel="external">tolua++中文注释</a>（待整理）<br> 然后就如何添加自定义cpp对象到lua中，在quick中流程如下：</p>
+<ol>
+<li>写好自定义类Class.h Class.cpp</li>
+<li>写好tolua++需要的pkg文件（quick中的tolua文件）</li>
+<li>使用tolua++生成中间文件，toluaclass.h toluaclass.cpp</li>
+<li>将这些中间文件加入quick工程的cpp代码中。</li>
+<li><strong>重新编译quick-player，使用新生成的模拟器</strong></li>
+</ol>
+</li>
+<li><p>quick framework</p>
+</li>
+</ol>
+<ul>
+<li><p><code>framework/function.lua</code></p>
+</li>
+<li><p><code>framework/cc/components/behavior/StateMachine.lua</code></p>
+</li>
+<li><code>framework/cc/mvc/AppBase.lua</code></li>
+</ul>
+<h2 id="u4E2D_u671F_u89C4_u5212"><a href="#u4E2D_u671F_u89C4_u5212" class="headerlink" title="中期规划"></a>中期规划</h2><!-- gitbook lua 2rd -->
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+	
+	
+		<li class="prev disabled"><a><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next disabled"><a>next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

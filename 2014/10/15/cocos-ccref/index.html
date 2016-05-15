@@ -1,0 +1,284 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- Ref | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="Ref是cocos2dx中的所有类的公共父类（objc中的超类的概念），说到公共父类自然是要说到Node了哦。说到Ref自然是要讲到AutoreleasePool和PoolManager
+路径1base/CCRef.h&amp;#10;base/CCRef.cpp
+自动管理cocos2dx中实现了内存的自动">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- Ref"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- Ref</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-10-15</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p><code>Ref</code>是<code>cocos2dx</code>中的所有类的公共父类（objc中的超类的概念），说到公共父类自然是要说到<a href="/2014-10-15/cocos-ccnode/">Node</a>了哦。<br>说到<code>Ref</code>自然是要讲到<a href="/2014-10-15/cocos-ccautoreleasepool">AutoreleasePool</a>和<a href="/2014-10-15/cocos-ccautoreleasepool">PoolManager</a></p>
+<h2 id="u8DEF_u5F84"><a href="#u8DEF_u5F84" class="headerlink" title="路径"></a>路径</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">base/CCRef.h&#10;base/CCRef.cpp</span><br></pre></td></tr></table></figure>
+<h2 id="u81EA_u52A8_u7BA1_u7406"><a href="#u81EA_u52A8_u7BA1_u7406" class="headerlink" title="自动管理"></a>自动管理</h2><p>cocos2dx中实现了内存的自动管理。一般情况下，我们如果要在cocos2dx中自定义类的话，最好还是继承自Ref，然后把内存的管理交给cocos2dx吧。</p>
+<p>这里看一段<code>Sprite</code>的类方法</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Sprite* Sprite::create()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">auto</span> pSprite = <span class="keyword">new</span> Sprite();</span><br><span class="line">    <span class="keyword">if</span> (pSprite &amp;&amp; pSprite-&gt;init())</span><br><span class="line">    &#123;</span><br><span class="line">        pSprite-&gt;autorelease();</span><br><span class="line">        <span class="keyword">return</span> pSprite;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    CC_SAFE_DELETE(pSprite);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>cocos2dx内置类的创建方法会自动把创建好的实例加入自动管理。</p>
+<h2 id="u6E90_u7801_u5206_u6790"><a href="#u6E90_u7801_u5206_u6790" class="headerlink" title="源码分析"></a>源码分析</h2><p>先贴上头文件，这里省去了脚本语言相关的东西，以后搞<code>lua</code>的时候再开一篇文章记录。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">ifndef</span> __CCREF_H__</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> __CCREF_H__</span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">"CCPlatformMacros.h"</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">"ccConfig.h"</span></span></span><br><span class="line"></span><br><span class="line">NS_CC_BEGIN</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> CC_DLL Ref</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">/* 增加引用计数 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">retain</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 减小引用计数 */</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">release</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 将该对象加入内存自动回收管理 */</span></span><br><span class="line">    <span class="function">Ref* <span class="title">autorelease</span><span class="params">()</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> <span class="title">getReferenceCount</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    Ref();</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~Ref();</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="comment">/* 引用计数 */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> _referenceCount;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">class</span> AutoreleasePool;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">NS_CC_END</span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">endif</span> <span class="comment">// __CCREF_H__</span></span></span><br></pre></td></tr></table></figure>
+<p>从头文件可知</p>
+<ul>
+<li><code>AutorelasePool</code>是<code>Ref</code>的友元函数</li>
+<li><code>cocos2dx</code>通过维护引用计数来实现内存的自动管理</li>
+</ul>
+<hr>
+<p>这里的cpp文件中的脚本语言相关的代码我就省去了。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">Ref::Ref() : _referenceCount(<span class="number">1</span>) &#123; &#125;</span><br><span class="line"></span><br><span class="line">Ref::~Ref() &#123; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Ref::retain()</span><br><span class="line">&#123;</span><br><span class="line">    CCASSERT(_referenceCount &gt; <span class="number">0</span>, <span class="string">"reference count should greater than 0"</span>);</span><br><span class="line">    ++_referenceCount;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Ref::release()</span><br><span class="line">&#123;</span><br><span class="line">    CCASSERT(_referenceCount &gt; <span class="number">0</span>, <span class="string">"reference count should greater than 0"</span>);</span><br><span class="line">    --_referenceCount;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (_referenceCount == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line"><span class="preprocessor">#<span class="keyword">if</span> defined(COCOS2D_DEBUG) &amp;&amp; (COCOS2D_DEBUG &gt; <span class="number">0</span>)</span></span><br><span class="line">        <span class="comment">/* 开启调试模式下的话，会对该对象进行检查 */</span></span><br><span class="line">        <span class="comment">/* 检查是否还在PoolManager的管理之下 */</span></span><br><span class="line">        <span class="comment">/* 若还在管理之下的话，则引发一个断言 */</span></span><br><span class="line">        <span class="keyword">auto</span> poolManager = PoolManager::getInstance();</span><br><span class="line">        <span class="keyword">if</span> (!poolManager-&gt;getCurrentPool()-&gt;isClearing() &amp;&amp; poolManager-&gt;isObjectInPools(<span class="keyword">this</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            CCASSERT(<span class="literal">false</span>, <span class="string">"The reference shouldn't be 0 because it is still in autorelease pool."</span>);</span><br><span class="line">        &#125;</span><br><span class="line"><span class="preprocessor">#<span class="keyword">endif</span></span></span><br><span class="line">        <span class="keyword">delete</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Ref* Ref::autorelease()</span><br><span class="line">&#123;</span><br><span class="line">    PoolManager::getInstance()-&gt;getCurrentPool()-&gt;addObject(<span class="keyword">this</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">unsigned</span> <span class="keyword">int</span> Ref::getReferenceCount() <span class="keyword">const</span> &#123; <span class="keyword">return</span> _referenceCount; &#125;</span><br></pre></td></tr></table></figure>
+<p>通过阅读源码，我们可以知道</p>
+<ul>
+<li>通过构造函数可知，创建的时候引用计数为1</li>
+<li><code>retain</code>只是单单的增加1个引用计数</li>
+<li><code>release</code>减少1个引用计数，若引用计数为0，则释放资源。</li>
+<li><code>autorelease</code>把该对象加入<code>PoolManager</code>的自动管理之中</li>
+</ul>
+<h2 id="u7528_u6CD5"><a href="#u7528_u6CD5" class="headerlink" title="用法"></a>用法</h2><p>当我们需要预加载一些资源的时候，可以先在游戏开始的时候，加载到内存当中，然后调用retain增加引用计数。<br>这样可以保证我们的资源不会被cocos2dx给自动回收掉。</p>
+<h3 id="u9519_u8BEF_u7684_u7528_u6CD5"><a href="#u9519_u8BEF_u7684_u7528_u6CD5" class="headerlink" title="错误的用法"></a>错误的用法</h3><p>这里的错误用法，取自源码里面的注释（=。=）</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 错误用法 1 */</span></span><br><span class="line"><span class="keyword">auto</span> obj = Node::create(); </span><br><span class="line"><span class="comment">/* 由于该对象是一个自动管理的引用计数为1的对象 */</span></span><br><span class="line"><span class="comment">/* 调用autorelease会再次加入内存自动管理 */</span></span><br><span class="line"><span class="comment">/* 由于cocos2dx的内存自动管理会定期清理一次 */</span></span><br><span class="line"><span class="comment">/* 那么现在这个obj对象在cocos2dx每次清理的时候会调用两次release */</span></span><br><span class="line">obj-&gt;autorelease(); </span><br><span class="line"></span><br><span class="line"><span class="comment">/* 错误用法 2 */</span></span><br><span class="line"><span class="keyword">auto</span> obj = Node::create();</span><br><span class="line"><span class="comment">/* 由于该对象是一个自动管理的引用计数为1的对象 */</span></span><br><span class="line"><span class="comment">/* 调用release则会直接释放对象。*/</span></span><br><span class="line"><span class="comment">/* 在调试模式下，会引发断言 */</span></span><br><span class="line">obj-&gt;release();</span><br></pre></td></tr></table></figure>
+<h2 id="u603B_u7ED3"><a href="#u603B_u7ED3" class="headerlink" title="总结"></a>总结</h2><p>这篇文章只是单单分析了<code>Ref</code>这个类，<code>cocos2dx</code>这个内存自动管理的机制，看上去还蛮简单的。</p>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+			
+			
+			
+		
+	
+		
+			
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/10/15/cocos-ccautoreleasepool/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/10/13/cocos-ccmenu/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

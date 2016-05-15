@@ -1,0 +1,226 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C 语言异常处理 setjmp &amp; longjmp | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="最近在读 lua 5.1.5 源码 , 看到以下代码:
+1234567891011121314151617181920#if defined(__cplusplus)/* C++ exceptions */#define LUAI_THROW(L,c)	throw(c)#define LUAI_TR">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="C 语言异常处理 setjmp &amp; longjmp"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">C 语言异常处理 setjmp &amp; longjmp</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2015-09-05</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  
+
+  
+	<div class="col-md-12">
+	  
+
+	  <!-- content -->
+	  <p>最近在读 <code>lua 5.1.5 源码</code> , 看到以下代码:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">if</span> defined(__cplusplus)</span></span><br><span class="line"><span class="comment">/* C++ exceptions */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> LUAI_THROW(L,c)	throw(c)</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> LUAI_TRY(L,c,a)	try &#123; a &#125; catch(...) \</span><br><span class="line">	&#123; <span class="keyword">if</span> ((c)-&gt;status == <span class="number">0</span>) (c)-&gt;status = -<span class="number">1</span>; &#125;</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> luai_jmpbuf	int  <span class="comment">/* dummy variable */</span></span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">elif</span> defined(LUA_USE_ULONGJMP)</span></span><br><span class="line"><span class="comment">/* in Unix, try _longjmp/_setjmp (more efficient) */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> LUAI_THROW(L,c)	_longjmp((c)-&gt;b, <span class="number">1</span>)</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> LUAI_TRY(L,c,a)	<span class="keyword">if</span> (_setjmp((c)-&gt;b) == <span class="number">0</span>) &#123; a &#125;</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> luai_jmpbuf	jmp_buf</span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">else</span></span></span><br><span class="line"><span class="comment">/* default handling with long jumps */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> LUAI_THROW(L,c)	longjmp((c)-&gt;b, <span class="number">1</span>)</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> LUAI_TRY(L,c,a)	<span class="keyword">if</span> (setjmp((c)-&gt;b) == <span class="number">0</span>) &#123; a &#125;</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> luai_jmpbuf	jmp_buf</span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<p>十分疑惑，所以就在网上找了资料学习了下。</p>
+<h2 id="u600E_u4E48_u56DE_u4E8B_u513F_3F"><a href="#u600E_u4E48_u56DE_u4E8B_u513F_3F" class="headerlink" title="怎么回事儿?"></a>怎么回事儿?</h2><p><code>setjmp</code> 和 <code>longjmp</code> 需要通过 <code>jmp_buf</code> 结合起来使用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">do</span> </span><br><span class="line">&#123;</span><br><span class="line">    jmp_buf __buf;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * setting exceptions handling</span><br><span class="line">     */</span></span><br><span class="line">    <span class="keyword">switch</span>(setjmp(__buf))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">0</span>                : <span class="comment">/* do nothing */</span> <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> EXCEPTION_TYPE_1 : <span class="comment">/* exception handle */</span> <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> EXCEPTION_TYPE_2 : <span class="comment">/* exception handle */</span> <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> EXCEPTION_TYPE_3 : <span class="comment">/* exception handle */</span> <span class="keyword">break</span>;</span><br><span class="line">        .</span><br><span class="line">        .</span><br><span class="line">        .</span><br><span class="line">        <span class="keyword">default</span>               : <span class="comment">/* final */</span> <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span><br><span class="line">     * there are some try blocks</span><br><span class="line">     */</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//BLOCK CODES</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span><br><span class="line">         * throw a exception</span><br><span class="line">         */</span></span><br><span class="line">        longjmp(__buf, EXCEPTION_TYPE_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125; <span class="keyword">while</span>(<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>setjmp</code> 第一次执行的时候返回的是 <code>0</code> ，表示成功设置 <code>jmp_buf</code> </li>
+<li><code>longjmp</code> 每次执行之后，程序便会跳转到 <code>setjmp</code> 处，<strong><em>再去执行</em></strong> <code>setjmp</code>, 不过此时 <code>setjmp</code> 执行之后的返回值是<strong><em>本次</em></strong> <code>longjmp</code> 调用时传入的第二个参数 <code>EXCEPTION_TYPE_VALUE</code></li>
+<li><code>setjmp</code> 和 <code>longjmp</code> 需要使用同一个 <code>jmp_buf</code></li>
+</ul>
+<p>这里我就很无赖的直接贴上这篇文章(<a href="http://www.di.unipi.it/~nids/docs/longjump_try_trow_catch.html" target="_blank" rel="external">[Exceptions in C with Longjmp and Setjmp]</a>)最后的给出的代码(<a href="http://www.di.unipi.it/~nids/docs/try_throw_catch.h" target="_blank" rel="external">[try_throw_catch.h]</a>)以供参考</p>
+<h2 id="u6700_u540E_u8BF4_u70B9_u5176_u4ED6_u7684"><a href="#u6700_u540E_u8BF4_u70B9_u5176_u4ED6_u7684" class="headerlink" title="最后说点其他的"></a>最后说点其他的</h2><p>看到这对函数，我更加明白为何在异常处理中出现异常会很难处理了。也突然想起之前学C语言的时候，书上不建议使用 <code>goto</code> 来写程序。说不定 <code>setjmp</code> 和 <code>longjmp</code> 的实现和 <code>goto</code> 有点关系呢。</p>
+<h3 id="setjmp__u548C_setjmp__u533A_u522B"><a href="#setjmp__u548C_setjmp__u533A_u522B" class="headerlink" title="_setjmp 和 setjmp 区别"></a>_setjmp 和 setjmp 区别</h3><p><a href="http://linux.die.net/man/3/_setjmp" target="_blank" rel="external">[_setjmp(3) - Linux man page]</a></p>
+<ul>
+<li><strong>_longjmp, _setjmp - non-local goto</strong></li>
+</ul>
+<h3 id="goto__u548C_setjmp_2C_longjmp__u533A_u522B"><a href="#goto__u548C_setjmp_2C_longjmp__u533A_u522B" class="headerlink" title="goto 和 setjmp, longjmp 区别"></a>goto 和 setjmp, longjmp 区别</h3><p><a href="http://www.geekinterview.com/question_details/3330" target="_blank" rel="external">[Difference between goto and longjmp() and setjmp()]</a></p>
+<ul>
+<li><code>goto</code> 只能在单一函数中实现跳转</li>
+<li><code>setjmp</code>, <code>longjmp</code> 可以实现在不同函数之间进行跳转 </li>
+</ul>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2015/09/20/c/getopt/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next disabled"><a>next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

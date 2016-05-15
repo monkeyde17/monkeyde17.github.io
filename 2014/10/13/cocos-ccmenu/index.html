@@ -1,0 +1,273 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- Menu | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="之前写过了ETMutiMenu实现了多点触控的菜单类，突然想起来，就来写篇文章来分析下cocos2dx-3.0中的Menu。
+用法我刚刚开始的时候，很笨的先创建好MenuItem*然后用Menu的某个静态方法来创建。后来阅读源码之后，发现Menu是遍历所有子儿子的，所以只要创建一个空的Menu，之后">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- Menu"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- Menu</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-10-13</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p>之前写过了<code>ETMutiMenu</code>实现了多点触控的菜单类，突然想起来，就来写篇文章来分析下<code>cocos2dx-3.0</code>中的<code>Menu</code>。</p>
+<h2 id="u7528_u6CD5"><a href="#u7528_u6CD5" class="headerlink" title="用法"></a>用法</h2><p>我刚刚开始的时候，很笨的先创建好<code>MenuItem*</code>然后用<code>Menu</code>的某个静态方法来创建。<br>后来阅读源码之后，发现<code>Menu</code>是遍历所有子儿子的，所以只要创建一个空的<code>Menu</code>，之后<code>addChild</code>便是。<br>这里需要注意的是<code>Menu</code>的子儿子必须是<code>MenuItem</code>的子类，不然在运行过程中会崩溃。</p>
+<h2 id="u8DEF_u5F84"><a href="#u8DEF_u5F84" class="headerlink" title="路径"></a>路径</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cocos/2d/menu-nodes/CCMenu.h&#10;cocos/2d/menu-nodes/CCMenu.cpp</span><br></pre></td></tr></table></figure>
+<h2 id="u6E90_u7801_u5206_u6790"><a href="#u6E90_u7801_u5206_u6790" class="headerlink" title="源码分析"></a>源码分析</h2><p>先贴上头文件，删去了一些我认为不是很重要的类声明，想要自己仔细看看的，还是自己去看源码吧。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">ifndef</span> __CCMENU_H_</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> __CCMENU_H_</span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">"CCMenuItem.h"</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">"CCLayer.h"</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">"CCVector.h"</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">"CCEventTouch.h"</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">"CCValue.h"</span></span></span><br><span class="line"></span><br><span class="line">NS_CC_BEGIN</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> CC_DLL Menu : <span class="keyword">public</span> Layer</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="comment">/* Menu的状态 */</span></span><br><span class="line">        <span class="keyword">enum</span> <span class="keyword">class</span> State</span><br><span class="line">        &#123;</span><br><span class="line">            WAITING,</span><br><span class="line">            TRACKING_TOUCH,</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 开头都是一些静态类方法，用于创建菜单类 */</span></span><br><span class="line">        <span class="function"><span class="keyword">static</span> Menu* <span class="title">create</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">if</span> (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)</span></span><br><span class="line">        <span class="comment">/* 此处略去 */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">else</span></span></span><br><span class="line">        <span class="comment">/** creates a Menu with MenuItem objects */</span></span><br><span class="line">        <span class="function"><span class="keyword">static</span> Menu* <span class="title">create</span><span class="params">(MenuItem* item, ...)</span> CC_REQUIRES_NULL_TERMINATION</span>;</span><br><span class="line"><span class="preprocessor">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 此处略去，即重载的创建菜单类*/</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 此处略去，主要是对菜单内菜单项的各种排列函数 */</span></span><br><span class="line">        <span class="comment">/* 以后有空仔细看看，今天晚上就算了，明天还要起来洗衣服，真是忧伤=。= */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 开启关闭菜单 */</span></span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">isEnabled</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _enabled; &#125;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">setEnabled</span><span class="params">(<span class="keyword">bool</span> value)</span> </span>&#123; _enabled = value; &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 触摸时间回调 */</span></span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">onTouchBegan</span><span class="params">(Touch* touch, Event* event)</span></span>;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onTouchEnded</span><span class="params">(Touch* touch, Event* event)</span></span>;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onTouchCancelled</span><span class="params">(Touch* touch, Event* event)</span></span>;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onTouchMoved</span><span class="params">(Touch* touch, Event* event)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// overrides</span></span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">removeChild</span><span class="params">(Node* child, <span class="keyword">bool</span> cleanup)</span> override</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 重载了addChild */</span></span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Node * child)</span> override</span>;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Node * child, <span class="keyword">int</span> zOrder)</span> override</span>;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">addChild</span><span class="params">(Node * child, <span class="keyword">int</span> zOrder, <span class="keyword">int</span> tag)</span> override</span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onEnter</span><span class="params">()</span> override</span>;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">onExit</span><span class="params">()</span> override</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 这两个暂时不知什么用 */</span></span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">setOpacityModifyRGB</span><span class="params">(<span class="keyword">bool</span> bValue)</span> override </span>&#123;CC_UNUSED_PARAM(bValue);&#125;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">isOpacityModifyRGB</span><span class="params">(<span class="keyword">void</span>)</span> <span class="keyword">const</span> override </span>&#123; <span class="keyword">return</span> <span class="literal">false</span>;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Node */</span></span><br><span class="line">        <span class="keyword">virtual</span> <span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">getDescription</span><span class="params">()</span> <span class="keyword">const</span> override</span>;</span><br><span class="line"></span><br><span class="line">CC_CONSTRUCTOR_ACCESS: <span class="comment">/* protected*/</span> </span><br><span class="line"></span><br><span class="line">        Menu() : _selectedItem(<span class="literal">nullptr</span>) &#123;&#125;</span><br><span class="line">        <span class="keyword">virtual</span> ~Menu();</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">bool</span> <span class="title">init</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 在这里进行初始化，属性的设置，以及注册触摸事件 */</span></span><br><span class="line">        <span class="function"><span class="keyword">bool</span> <span class="title">initWithArray</span><span class="params">(<span class="keyword">const</span> Vector&lt;MenuItem*&gt;&amp; arrayOfItems)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span>:</span><br><span class="line">        <span class="keyword">bool</span> _enabled;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 关键的一个函数，来判断某个MenuItem是否被触摸到 */</span></span><br><span class="line">        <span class="function">MenuItem* <span class="title">getItemForTouch</span><span class="params">(Touch * touch)</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 存储当前Menu的状态 */</span></span><br><span class="line">        State _state;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 存储当前被触摸的MenuItem */</span></span><br><span class="line">        <span class="comment">/* 所以Menu就是支持单个触摸的 */</span></span><br><span class="line">        <span class="comment">/* 你看看那个initWithArray，里面注册的触摸类型也都是TouchOneByOne */</span></span><br><span class="line">        <span class="comment">/* 我之前写的那个ETMutiMenu的话，这里是一个数组 */</span></span><br><span class="line">        MenuItem *_selectedItem;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        CC_DISALLOW_COPY_AND_ASSIGN(Menu);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">NS_CC_END</span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">endif</span><span class="comment">//__CCMENU_H_</span></span></span><br></pre></td></tr></table></figure>
+<p>当然是先看看初始化的相关的函数<code>initWithArray</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> Menu::initWithArray(<span class="keyword">const</span> Vector&lt;MenuItem*&gt;&amp; arrayOfItems)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (Layer::init())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* 开启触摸 */</span></span><br><span class="line">        _enabled = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/************************************************/</span></span><br><span class="line">        <span class="comment">/* 此处略去，主要是描点，大小，位置等信息的设定 */</span></span><br><span class="line">        <span class="comment">/************************************************/</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 将列表中的MenuItem添加到Menu的子儿子中 */</span></span><br><span class="line">        <span class="comment">/* 所以还是自己addChild来的好，还可以自定义每个MenuItem的z轴 */</span></span><br><span class="line">        <span class="keyword">int</span> z=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; item : arrayOfItems)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>-&gt;addChild(item, z);</span><br><span class="line">            z++;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        _selectedItem = <span class="literal">nullptr</span>;</span><br><span class="line">        _state = Menu::State::WAITING;</span><br><span class="line"></span><br><span class="line">        setCascadeColorEnabled(<span class="literal">true</span>);</span><br><span class="line">        setCascadeOpacityEnabled(<span class="literal">true</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">/* 注册一个单点触摸事件 */</span></span><br><span class="line">        <span class="keyword">auto</span> touchListener = EventListenerTouchOneByOne::create();</span><br><span class="line">        touchListener-&gt;setSwallowTouches(<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 这里算是绑定回调函数 */</span></span><br><span class="line">        <span class="comment">/* 这里是用到了c++11的特性 -- std::bind */</span></span><br><span class="line">        touchListener-&gt;onTouchBegan = CC_CALLBACK_2(Menu::onTouchBegan, <span class="keyword">this</span>);</span><br><span class="line">        touchListener-&gt;onTouchMoved = CC_CALLBACK_2(Menu::onTouchMoved, <span class="keyword">this</span>);</span><br><span class="line">        touchListener-&gt;onTouchEnded = CC_CALLBACK_2(Menu::onTouchEnded, <span class="keyword">this</span>);</span><br><span class="line">        touchListener-&gt;onTouchCancelled = CC_CALLBACK_2(Menu::onTouchCancelled, <span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">        _eventDispatcher-&gt;addEventListenerWithSceneGraphPriority(touchListener, <span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接着当然是看看触摸事件绑定的那四个函数怎么写了</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> Menu::onTouchBegan(Touch* touch, Event* event)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* 若Menu状态不对，不可见，或是不可触摸，则直接返回false */</span></span><br><span class="line">    <span class="keyword">if</span> (_state != Menu::State::WAITING || ! _visible || !_enabled) &#123; <span class="keyword">return</span> <span class="literal">false</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 查找所有直系祖先节点，是否不可见， 若不可见则直接返回false */</span></span><br><span class="line">    <span class="keyword">for</span> (Node *c = <span class="keyword">this</span>-&gt;_parent; c != <span class="literal">nullptr</span>; c = c-&gt;getParent())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (c-&gt;isVisible() == <span class="literal">false</span>) &#123; <span class="keyword">return</span> <span class="literal">false</span>; &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 若获触摸到MenuItem则返回该按钮， 并触发该MenuItem的selected函数, 并进行下面的事件 */</span></span><br><span class="line">    <span class="comment">/* 否则返回false */</span></span><br><span class="line">    _selectedItem = <span class="keyword">this</span>-&gt;getItemForTouch(touch);</span><br><span class="line">    <span class="keyword">if</span> (_selectedItem)</span><br><span class="line">    &#123;</span><br><span class="line">        _state = Menu::State::TRACKING_TOUCH;</span><br><span class="line">        _selectedItem-&gt;selected();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Menu::onTouchEnded(Touch* touch, Event* event)</span><br><span class="line">&#123;</span><br><span class="line">    CCASSERT(_state == Menu::State::TRACKING_TOUCH, <span class="string">"[Menu ccTouchEnded] -- invalid state"</span>);</span><br><span class="line">    <span class="keyword">this</span>-&gt;retain();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这里是松开按钮的时候 */</span></span><br><span class="line">    <span class="comment">/* 调用MenuItem的unselected和activeate */</span></span><br><span class="line">    <span class="comment">/* 若该MenuItem还绑定了回调函数，会在这个时候调用 */</span></span><br><span class="line">    <span class="keyword">if</span> (_selectedItem)</span><br><span class="line">    &#123;</span><br><span class="line">        _selectedItem-&gt;unselected();</span><br><span class="line">        _selectedItem-&gt;activate();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 到此一次触摸结束，Menu重回WAITING状态 */</span></span><br><span class="line">    _state = Menu::State::WAITING;</span><br><span class="line">    <span class="keyword">this</span>-&gt;release();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 这个取消回调调用之后马上调用了onTouchEnded */</span></span><br><span class="line"><span class="keyword">void</span> Menu::onTouchCancelled(Touch* touch, Event* event)</span><br><span class="line">&#123;</span><br><span class="line">    CCASSERT(_state == Menu::State::TRACKING_TOUCH, <span class="string">"[Menu ccTouchCancelled] -- invalid state"</span>);</span><br><span class="line">    <span class="keyword">this</span>-&gt;retain();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (_selectedItem) &#123; _selectedItem-&gt;unselected(); &#125;</span><br><span class="line"></span><br><span class="line">    _state = Menu::State::WAITING;</span><br><span class="line">    <span class="keyword">this</span>-&gt;release();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Menu::onTouchMoved(Touch* touch, Event* event)</span><br><span class="line">&#123;</span><br><span class="line">    CCASSERT(_state == Menu::State::TRACKING_TOUCH, <span class="string">"[Menu ccTouchMoved] -- invalid state"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 获得当前触摸到的MenuItem */</span></span><br><span class="line">    MenuItem *currentItem = <span class="keyword">this</span>-&gt;getItemForTouch(touch);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这里的情况是，从一个MenuItem的开始一直按住，然后移动到另一个MenuItem */</span></span><br><span class="line">    <span class="keyword">if</span> (currentItem != _selectedItem)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* 这里是将原来的那个恢复原状，即未选择状态 */</span></span><br><span class="line">        <span class="keyword">if</span> (_selectedItem) &#123; _selectedItem-&gt;unselected(); &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 记录新按下的按钮，并将该按钮置为按下状态 */</span></span><br><span class="line">        _selectedItem = currentItem;</span><br><span class="line">        <span class="keyword">if</span> (_selectedItem) &#123; _selectedItem-&gt;selected(); &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面讲到的一个很关键的函数<code>getItemForTouch</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">MenuItem* Menu::getItemForTouch(Touch *touch)</span><br><span class="line">&#123;</span><br><span class="line">    Point touchLocation = touch-&gt;getLocation();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这个函数的功能是，遍历所有可见，可触摸的子儿子 */</span></span><br><span class="line">    <span class="comment">/* 检查是否有被触摸的MenuItem */</span></span><br><span class="line">    <span class="comment">/* 若有，则返回该MenuItem */</span></span><br><span class="line">    <span class="comment">/* 否则，返回nullptr */</span></span><br><span class="line">    <span class="keyword">if</span> (!_children.empty())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span> iter = _children.crbegin(); iter != _children.crend(); ++iter)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">/* 这里的强制转换，表示子儿子必须是MenuItem的子类 */</span></span><br><span class="line">            MenuItem* child = <span class="keyword">dynamic_cast</span>&lt;MenuItem*&gt;(*iter);</span><br><span class="line">            <span class="comment">/* 这里只检查可见，开启触摸的MenuItem */</span></span><br><span class="line">            <span class="keyword">if</span> (child &amp;&amp; child-&gt;isVisible() &amp;&amp; child-&gt;isEnabled())</span><br><span class="line">            &#123;</span><br><span class="line">                Point local = child-&gt;convertToNodeSpace(touchLocation);</span><br><span class="line">                Rect r = child-&gt;rect();</span><br><span class="line">                r.origin = Point::ZERO;</span><br><span class="line"></span><br><span class="line">                <span class="comment">/* 若触摸点在按钮矩形boudingBox内的话，返回改按钮 */</span></span><br><span class="line">                <span class="keyword">if</span> (r.containsPoint(local))</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">return</span> child;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>本来想最开始讲的<code>onEneter</code>和<code>onExit</code>现在放到了最后说，也是醉了。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 实际上onEnter没啥特别的 */</span></span><br><span class="line"><span class="comment">/* 本来是认为触摸函数的注册会放这里 */</span></span><br><span class="line"><span class="keyword">void</span> Menu::onEnter()</span><br><span class="line">&#123;</span><br><span class="line">    Layer::onEnter();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Menu::onExit()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_state == Menu::State::TRACKING_TOUCH)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (_selectedItem)</span><br><span class="line">        &#123;</span><br><span class="line">            _selectedItem-&gt;unselected();</span><br><span class="line">            _selectedItem = <span class="literal">nullptr</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        _state = Menu::State::WAITING;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Layer::onExit();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> Menu::removeChild(Node* child, <span class="keyword">bool</span> cleanup)</span><br><span class="line">&#123;</span><br><span class="line">    MenuItem *menuItem = <span class="keyword">dynamic_cast</span>&lt;MenuItem*&gt;(child);</span><br><span class="line">    CCASSERT(menuItem != <span class="literal">nullptr</span>, <span class="string">"Menu only supports MenuItem objects as children"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (JselectedItem == menuItem) &#123; _selectedItem = <span class="literal">nullptr</span>; &#125;</span><br><span class="line"></span><br><span class="line">    Node::removeChild(child, cleanup);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后看到<code>onExit</code>会在<code>Menu</code>正在处理触摸状态下对以选中的<code>MenuItem</code>释放。<br>而且<code>removeChild</code>自然也是会对正在选中的<code>MenuItem</code>释放=。=</p>
+<p>到此，<code>Menu</code>的分析已经结束了，下篇文章还是整理下<code>Node</code>和<code>Ref</code>这些基类吧。</p>
+<hr>
+<h2 id="Ending"><a href="#Ending" class="headerlink" title="Ending"></a>Ending</h2><p>帅哥最近貌似也挺忙的，自己这几天也懈怠了，批评下自己，帅哥啊，求<code>提醒</code>啊，求<code>监督</code>啊。</p>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+			
+		
+	
+		
+	
+		
+			
+			
+			
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/10/15/cocos-ccref/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/09/25/cocos-console/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

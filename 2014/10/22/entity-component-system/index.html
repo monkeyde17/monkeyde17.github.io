@@ -1,0 +1,270 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Entity Component System ---- 数据驱动模型 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="写Node类的源码分析的时候瞟见Component和ComponentContainer，不知此为何物，便google之，得以下资料：
+文章:
+
+在cocos2d-x中实践数据驱动的游戏开发 
+Understanding Component-Entity-Systems
+Implementing C">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="Entity Component System ---- 数据驱动模型"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">Entity Component System ---- 数据驱动模型</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2014-10-22</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <p>写<code>Node</code>类的源码分析的时候瞟见<code>Component</code>和<code>ComponentContainer</code>，不知此为何物，便google之，得以下资料：</p>
+<p>文章:</p>
+<ul>
+<li><a href="http://chaimzane.iteye.com/blog/2007573" target="_blank" rel="external">在cocos2d-x中实践数据驱动的游戏开发</a> </li>
+<li><a href="http://www.gamedev.net/page/resources/_/technical/game-programming/understanding-component-entity-systems-r3013" target="_blank" rel="external">Understanding Component-Entity-Systems</a></li>
+<li><a href="http://www.gamedev.net/page/resources/_/technical/game-programming/understanding-component-entity-systems-r3013" target="_blank" rel="external">Implementing Component-Entity-Systems</a></li>
+<li><a href="http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/" target="_blank" rel="external">Evolve Your Hierarchy Refactoring Game Entities with Components</a></li>
+<li><a href="http://www.gamedev.net/page/resources/_/technical/game-programming/case-study-bomberman-mechanics-in-an-entity-component-system-r3159" target="_blank" rel="external">Case Study: Bomberman Mechanics in an Entity-Component-System</a></li>
+</ul>
+<p>PPT:</p>
+<ul>
+<li><a href="http://www.slideshare.net/gamelandvn/component-based-entity-system-mobile-game-development" target="_blank" rel="external">OGDC 2014: Component based entity system mobile game development</a></li>
+</ul>
+<p>Github</p>
+<ul>
+<li><a href="https://github.com/vinova/Artemis-Cpp" target="_blank" rel="external">github vinova/Artemis-Cpp</a></li>
+</ul>
+<p><strong>PS：待我好好研究这个github上的代码先，现在对ECS还是迷迷糊糊</strong></p>
+<h2 id="ECS_3F_CES_3F"><a href="#ECS_3F_CES_3F" class="headerlink" title="ECS? CES?"></a>ECS? CES?</h2><p>在<a href="http://en.wikipedia.org/wiki/Entity_component_system" target="_blank" rel="external">Wiki百科</a>上的是ECS，但是可以看到在上面有些文章中，把Entity-Component-System讲成Component-Entity-System，我猜是因为这样符合从小到大的原则吧。所以我这里也是按照CES的顺序来介绍。</p>
+<h2 id="Component__u2013__u6570_u636E"><a href="#Component__u2013__u6570_u636E" class="headerlink" title="Component – 数据"></a>Component – 数据</h2><p>Component直接翻译过来是<code>组件</code>的意思，实际上，在ECS中，仅仅是数据的集合。</p>
+<p>例如：</p>
+<ul>
+<li>位置(x, y)</li>
+<li>力(x, y)</li>
+<li>生命值(v)</li>
+</ul>
+<h2 id="Entity__u2013__u6E38_u620F_u5BF9_u8C61"><a href="#Entity__u2013__u6E38_u620F_u5BF9_u8C61" class="headerlink" title="Entity    – 游戏对象"></a>Entity    – 游戏对象</h2><p>Entity即实体，也就是游戏中的具体对象，可能包含多种Component，来表示某个具体的对象。</p>
+<p>例如：</p>
+<ul>
+<li>球(位置，力)</li>
+<li>敌人(位置，生命值)</li>
+</ul>
+<h2 id="System__u2013__u903B_u8F91_u63A7_u5236"><a href="#System__u2013__u903B_u8F91_u63A7_u5236" class="headerlink" title="System    – 逻辑控制"></a>System    – 逻辑控制</h2><p>System则是对Entity中Component处理的逻辑部分。</p>
+<p>先引用一张描述Entity的图片:</p>
+<p><img src="http://dl2.iteye.com/upload/attachment/0093/3784/31f959c8-a47b-38ad-b872-4365419e8a73.png" alt="Entity -- 钥匙"> </p>
+<p>有人把<code>Entity</code>比喻成一把<code>钥匙</code>，一把<code>钥匙</code>上有很多<code>钥匙齿</code>，这里的<code>钥匙齿</code>就代表一个<code>Component</code>。</p>
+<p>再引用一张描述System的图片:</p>
+<p><img src="http://dl2.iteye.com/upload/attachment/0093/3786/6bb23d14-6bdc-3fad-b83a-1869ec600b9f.png" alt="System -- 锁"></p>
+<p><code>System</code>自然就被比喻成一把<code>锁</code>，一个<code>锁</code>去寻找适合的<code>钥匙</code>。<code>钥匙</code>的<code>钥匙齿</code>要符合<code>System</code>的要求 (这里的<code>钥匙</code>不需要和<code>锁</code>全匹配，只需要匹配<code>锁</code>所需要的<code>钥匙齿</code>就行)</p>
+<p>例如：</p>
+<ul>
+<li>移动系统(位置)</li>
+<li>空气系统(位置，力)</li>
+<li>受伤系统(生命值，位置）</li>
+</ul>
+<p>对于<code>移动系统</code>，可以用于<code>球实体</code>和<code>敌人实体</code>，因为<code>移动系统</code>只操作<code>位置组件</code>。<br>对于<code>空气系统</code>，只有<code>球实体</code>满足<code>空气系统</code>要求的<code>位置组件</code>和<code>力组件</code>。</p>
+<h2 id="u600E_u4E48_u7528_uFF1F__u2014-__u5B9E_u4F8B_u5206_u6790"><a href="#u600E_u4E48_u7528_uFF1F__u2014-__u5B9E_u4F8B_u5206_u6790" class="headerlink" title="怎么用？ —- 实例分析"></a>怎么用？ —- 实例分析</h2><p>如何用到游戏中呢？ 我看了<a href="https://github.com/vinova/Artemis-Cpp" target="_blank" rel="external">vinova/Artemis-Cpp</a>这个的实现。</p>
+<p>我前几日看了下代码，给加上了中文注释<a href="https://github.com/monkeyde17/et-entity-component-system" target="_blank" rel="external">Artemis-Cpp中文注释</a></p>
+<p>感觉直接将也讲不出什么来，想想还是在cocos2dx中加入之后，在来具体分析吧。</p>
+<h2 id="Cocos2dx__26amp_3B_ECS__u2014-_26gt_3B__u5408_u4F53_uFF01"><a href="#Cocos2dx__26amp_3B_ECS__u2014-_26gt_3B__u5408_u4F53_uFF01" class="headerlink" title="Cocos2dx &amp; ECS —-&gt; 合体！"></a>Cocos2dx &amp; ECS —-&gt; 合体！</h2><p><del>TO BE CONTINUE…</del><br><del>PS: 这周末搞！</del></p>
+<p>当当当~~~发现了一个<a href="http://github.com/genius-x/genius-x" target="_blank" rel="external">genius-x</a>，主要是同事买了本书（之前我还建议他不要买来着，现在想想也是醉了=……=）我翻了翻目录便看到了相关的东西。</p>
+<p>正所谓不要重复制造轮子是不。让我去好好研究几天。搞个小demo出来？</p>
+<h2 id="Genius-x__u5B9E_u6218__u2014-__28_u5199_u5565_u5F85_u5B9A_7E_7E_29"><a href="#Genius-x__u5B9E_u6218__u2014-__28_u5199_u5565_u5F85_u5B9A_7E_7E_29" class="headerlink" title="Genius-x 实战 —- (写啥待定~~)"></a>Genius-x 实战 —- (写啥待定~~)</h2>	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2014/12/22/ecs-genius-x/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next disabled"><a>next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>cocos2dx 3.0 ---- Event Dispatcher 事件分发机制 | Hexo</title>
+  <meta name="author" content="John Doe">
+  
+  <meta name="description" content="事件和监听器cocos2dx 3.0 中事件和监听器，结合CCEvent和CCEventListener的代码
+
+
+
+Event
+Listener
+
+
+
+
+TOUCH
+TOUCH_ONE_BY_ONE
+
+
+
+TOUCH_ALL_AT_ONCE
+
+
+KEYBOARD
+KEYBOARD
+
+
+ACCELE">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="cocos2dx 3.0 ---- Event Dispatcher 事件分发机制"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link href="/favicon.png" rel="icon">
+  
+  
+  <link rel="stylesheet" href="/css/bootstrap.min.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/font-awesome.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/highlight.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/google-fonts.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/responsive.css" media="screen" type="text/css">  
+  <link rel="stylesheet" href="/css/sidenav.css" media="screen" type="text/css">  
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+
+  <script src="/js/jquery-2.0.3.min.js"></script>
+
+  <!-- analytics -->
+  
+
+</head>
+
+<body id="body" data-spy="scroll" data-target=".toc">
+  <div class="container" id="container">
+	<div class="content">
+	  <div class="page-header">		
+  <h1><a class="brand" href="/">Hexo</a><span class="split"></span><span class="title">cocos2dx 3.0 ---- Event Dispatcher 事件分发机制</span><span class="date" id="title-date"><i class="fa fa-clock-o"></i> 2015-01-07</span></h1>
+</div>		
+
+<div class="row page">
+  <!-- cols -->	
+  
+  <div class="col-xs-12 col-sm-3 col-md-3 toc"> 
+	<!-- toc -->
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+ 		   generateWikiTOC('.note', '.toc',  2 , 2 );
+		});
+</script>
+  </div><!-- col-md-3 -->
+  
+  
+
+  
+  <div class="col-xs-12 col-sm-9 col-md-9 note">
+	
+
+	  <!-- content -->
+	  <h2 id="u4E8B_u4EF6_u548C_u76D1_u542C_u5668"><a href="#u4E8B_u4EF6_u548C_u76D1_u542C_u5668" class="headerlink" title="事件和监听器"></a>事件和监听器</h2><p>cocos2dx 3.0 中事件和监听器，结合<code>CCEvent</code>和<code>CCEventListener</code>的代码</p>
+<table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Listener</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TOUCH</td>
+<td>TOUCH_ONE_BY_ONE</td>
+</tr>
+<tr>
+<td></td>
+<td>TOUCH_ALL_AT_ONCE</td>
+</tr>
+<tr>
+<td>KEYBOARD</td>
+<td>KEYBOARD</td>
+</tr>
+<tr>
+<td>ACCELERATION</td>
+<td>ACCELERATION</td>
+</tr>
+<tr>
+<td>MOUSE</td>
+<td>MOUSE</td>
+</tr>
+<tr>
+<td>CUSTOM</td>
+<td>CUSTOM</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>EventListener::Type中还有一个UNKNOW</p>
+</blockquote>
+<p>对于手机客户端来说，最常用的便是TouchEvent和AccelerationEvent</p>
+<h2 id="u89E6_u6478"><a href="#u89E6_u6478" class="headerlink" title="触摸"></a>触摸</h2><p>对于EventListenerTouch，这里有两种类型：</p>
+<h3 id="EventListenerTouchOneByOne"><a href="#EventListenerTouchOneByOne" class="headerlink" title="EventListenerTouchOneByOne"></a>EventListenerTouchOneByOne</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> EventListenerTouchOneByOne : <span class="keyword">public</span> EventListener</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> LISTENER_ID;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setSwallowTouches</span><span class="params">(<span class="keyword">bool</span> needSwallow)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isSwallowTouches</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">/* std::function的参数类型是`Touch*`和`Event*` */</span></span><br><span class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">bool</span>(Touch*, Event*)&gt; onTouchBegan;</span><br><span class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(Touch*, Event*)&gt; onTouchMoved;</span><br><span class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(Touch*, Event*)&gt; onTouchEnded;</span><br><span class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(Touch*, Event*)&gt; onTouchCancelled;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Touch*&gt; _claimedTouches;</span><br><span class="line">    <span class="keyword">bool</span> _needSwallow;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">class</span> EventDispatcher;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>其实最关键的一句话就是<code>friend class EventDispatcher;</code><br>所有的操作都是在EventDispatcher中操作，所以重点分析的还是EventDispatcher</p>
+<h3 id="EventListenerTouchAllAtOnce"><a href="#EventListenerTouchAllAtOnce" class="headerlink" title="EventListenerTouchAllAtOnce"></a>EventListenerTouchAllAtOnce</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> EventListenerTouchAllAtOnce : <span class="keyword">public</span> EventListener</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> LISTENER_ID;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">/* std::function的参数类型是`std::vector&lt;Touch*&gt;`和`Event*` */</span></span><br><span class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Touch*&gt;&amp;, Event*)&gt; onTouchesBegan;</span><br><span class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Touch*&gt;&amp;, Event*)&gt; onTouchesMoved;</span><br><span class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Touch*&gt;&amp;, Event*)&gt; onTouchesEnded;</span><br><span class="line">    <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Touch*&gt;&amp;, Event*)&gt; onTouchesCancelled;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">class</span> EventDispatcher;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>和EventListenerTouchOneByOne的区别在于不可吞噬，还有就是回调函数的区别</p>
+<h2 id="u5206_u53D1_u5668"><a href="#u5206_u53D1_u5668" class="headerlink" title="分发器"></a>分发器</h2><h3 id="u6210_u5458_u53D8_u91CF"><a href="#u6210_u5458_u53D8_u91CF" class="headerlink" title="成员变量"></a>成员变量</h3><p>接下来便是成员变量，这里面有太多的表和集合，第一时间还不是很知道在搞毛。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="keyword">class</span> DirtyFlag</span><br><span class="line">&#123;</span><br><span class="line">    NONE = <span class="number">0</span>,</span><br><span class="line">    FIXED_PRIORITY = <span class="number">1</span> &lt;&lt; <span class="number">0</span>,</span><br><span class="line">    SCENE_GRAPH_PRIORITY = <span class="number">1</span> &lt;&lt; <span class="number">1</span>,</span><br><span class="line">    ALL = FIXED_PRIORITY | SCENE_GRAPH_PRIORITY</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;string, EventListenerVector*&gt;</code></td>
+<td>_listenerMap</td>
+<td>查找这种监听器对应的监听器数组 </td>
+</tr>
+<tr>
+<td><code>&lt;ListenerID, DirtyFlag&gt;</code></td>
+<td>_priorityDirtyFlagMap;</td>
+<td>表示这种监听器的标志位类别</td>
+</tr>
+<tr>
+<td><code>&lt;Node*, vector&lt;EventListener*&gt;*&gt;</code></td>
+<td>_nodeListenersMap;</td>
+<td>根据Node去查找对应的监听器数组</td>
+</tr>
+<tr>
+<td><code>&lt;Node*, int&gt;</code></td>
+<td>_nodePriorityMap;</td>
+<td>根据Node查找优先级表，用于排序</td>
+</tr>
+<tr>
+<td><code>&lt;float, vector&lt;Node*&gt;&gt;</code></td>
+<td>_globalZOrderNodeMap;</td>
+<td>根据全局Z轴查找的Node节点数组，用于生成_nodePriorityMap</td>
+</tr>
+<tr>
+<td><code>vector&lt;EventListener*&gt;</code></td>
+<td>_toAddedListeners;</td>
+<td>待加加入分发数组的监听器</td>
+</tr>
+<tr>
+<td><code>set&lt;Node*&gt;</code></td>
+<td>_dirtyNodes;</td>
+<td>待更新标识的显示顺序监听器</td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td>_inDispatch;</td>
+<td>在分发中的事件个数</td>
+</tr>
+<tr>
+<td><code>bool</code></td>
+<td>_isEnabled;</td>
+<td>是否开启事件分发</td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td>_nodePriorityIndex</td>
+<td>在生成_nodePriorityMap的时候的公共索引</td>
+</tr>
+<tr>
+<td><code>set&lt;string&gt;</code></td>
+<td>_internalCustomListenerIDs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="EventListenerVector"><a href="#EventListenerVector" class="headerlink" title="EventListenerVector"></a>EventListenerVector</h3><p>先看一个Dispatcher的内置类EventListenerVector</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> EventListenerVector</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    EventListenerVector();</span><br><span class="line">    ~EventListenerVector();</span><br><span class="line">    <span class="keyword">size_t</span> size() <span class="keyword">const</span>;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="keyword">const</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">push_back</span><span class="params">(EventListener* item)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">clearSceneGraphListeners</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">clearFixedListeners</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">clear</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">inline</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;EventListener*&gt;* getFixedPriorityListeners() <span class="keyword">const</span> &#123; <span class="keyword">return</span> _fixedListeners; &#125;;</span><br><span class="line">    <span class="keyword">inline</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;EventListener*&gt;* getSceneGraphPriorityListeners() <span class="keyword">const</span> &#123; <span class="keyword">return</span> _sceneGraphListeners; &#125;;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> ssize_t <span class="title">getGt0Index</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> _gt0Index; &#125;;</span><br><span class="line">    <span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">setGt0Index</span><span class="params">(ssize_t index)</span> </span>&#123; _gt0Index = index; &#125;;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;EventListener*&gt;* _fixedListeners;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;EventListener*&gt;* _sceneGraphListeners;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* _fixedListeners中优先级为0的开始下标 */</span></span><br><span class="line">    <span class="keyword">ssize_t</span> _gt0Index;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这个EventListenerVector实际上就是管理<strong>两个</strong>std::vector </p>
+<ul>
+<li>带有优先级的监听器 （_fixedListeners）</li>
+<li>按显示顺序的监听器 （_sceneGraphListeners）</li>
+</ul>
+<h3 id="Event_u5185_u7F6E_u7C7B_u578B"><a href="#Event_u5185_u7F6E_u7C7B_u578B" class="headerlink" title="Event内置类型"></a>Event内置类型</h3><table>
+<thead>
+<tr>
+<th>Event</th>
+<th>ListenerID</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EventListenerTouchOneByOne</td>
+<td>__cc_touch_one_by_one</td>
+</tr>
+<tr>
+<td>EventListenerTouchAllAtOnce</td>
+<td>__cc_touch_all_at_once</td>
+</tr>
+<tr>
+<td>EventListenerKeyBoard</td>
+<td>__cc_keyboard</td>
+</tr>
+<tr>
+<td>EventListenerMouse</td>
+<td>__cc_mouse</td>
+</tr>
+<tr>
+<td>EventListenerAcceleration</td>
+<td>__cc_acceleration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="u6DFB_u52A0_u76D1_u542C_u5668"><a href="#u6DFB_u52A0_u76D1_u542C_u5668" class="headerlink" title="添加监听器"></a>添加监听器</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> EventDispatcher::addEventListenerWithSceneGraphPriority(EventListener* Listener, Node *node)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!listener-&gt;checkAvailable()) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 需要设置关联的Node节点 */</span></span><br><span class="line">    listener-&gt;setAssociatedNode(node);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 对于按现实顺序的监听器预留的 0 */</span> </span><br><span class="line">    listener-&gt;setFixedPriority(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    listener-&gt;setRegistered(<span class="literal">true</span>);</span><br><span class="line">    addEventListener(listener);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> EventDispatcher::addEventListenerWithFixedPriority(EventListener* listener, <span class="keyword">int</span> fixedPriority)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!listener-&gt;checkAvailable()) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    listener-&gt;setAssociatedNode(<span class="literal">nullptr</span>);</span><br><span class="line">    listener-&gt;setFixedPriority(fixedPriority);</span><br><span class="line">    listener-&gt;setRegistered(<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* EventListener的默认值是true */</span></span><br><span class="line">    listener-&gt;setPaused(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">    addEventListener(listener);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">EventListenerCustom* EventDispatcher::addCustomEventListener(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> &amp;eventName, <span class="keyword">const</span> <span class="built_in">std</span>::function&lt;<span class="keyword">void</span>(EventCustom*)&gt;&amp; callback)</span><br><span class="line">&#123;</span><br><span class="line">    EventListenerCustom *listener = EventListenerCustom::create(eventName, callback);</span><br><span class="line">    addEventListenerWithFixedPriority(listener, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> listener;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> EventDispatcher::addEventListener(EventListener* listener)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_inDispatch == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* 若当前没有在分发事件，则将该监听器加入到分发中 */</span></span><br><span class="line">        forceAddEventListener(listener);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* 若当前正在分发事件，则将监听器加入到待添加数组_toAddedListeners中 */</span></span><br><span class="line">        <span class="comment">/* 在分发事件结束时，调用updateListeners再将监听器加入到分发中 */</span></span><br><span class="line">        _toAddedListeners.push_back(listener);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    listener-&gt;retain();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> EventDispatcher::forceAddEventListener(EventListener* listener)</span><br><span class="line">&#123;</span><br><span class="line">    EventListenerVector* listeners = <span class="literal">nullptr</span>;</span><br><span class="line">    EventListener::ListenerID listenerID = listener-&gt;getListenerID();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 根据监听器种类查找对应监听器数组 */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> itr = _listenerMap.find(listenerID);</span><br><span class="line">    <span class="keyword">if</span> (itr == _listenerMap.end())              <span class="comment">/* 若没有找到该监听器数组 */</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* 新建一个监听器数组，并加入到监听器数组表中 */</span></span><br><span class="line">        listeners = <span class="keyword">new</span> EventListenerVector();</span><br><span class="line">        _listenerMap.insert(<span class="built_in">std</span>::make_pair(listenerID, listeners));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        listeners = itr-&gt;second;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 将监听器加入到这类监听器数组中 */</span></span><br><span class="line">    listeners-&gt;push_back(listener);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (listener-&gt;getFixedPriority() == <span class="number">0</span>)      <span class="comment">/* 若是按显示顺序的监听器 */</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* 设置标识，加入到_priorityDirtyFlagMap */</span></span><br><span class="line">        setDirty(listenerID, DirtyFlag::SCENE_GRAPH_PRIORITY);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">auto</span> node = listener-&gt;getAssociatedNode();</span><br><span class="line">        CCASSERT(node != <span class="literal">nullptr</span>, <span class="string">"Invalid scene graph priority!"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 关联该节点和这个监听器*/</span></span><br><span class="line">        <span class="comment">/* 即将该监听器加入到 _nodeListenersMap 中 */</span></span><br><span class="line">        associateNodeAndEventListener(node, listener);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (node-&gt;isRunning())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">/* 将node加入_dirtyNodes */</span></span><br><span class="line">            resumeEventListenersForTarget(node);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>                                        <span class="comment">/* 若是全局优先级的监听器，仅仅只要设置标识即可 */</span></span><br><span class="line">    &#123;</span><br><span class="line">        setDirty(listenerID, DirtyFlag::FIXED_PRIORITY);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>为啥对于<code>按显示顺序的监听器</code>不需要setPaused(false)?</p>
+<p>对于这类监听器，setPaused是会在onEnter和onExit的过程中调用到。<br>（详见Node::resume &amp;&amp; Node::pause）<br>（最后还是调用EventDispatcher::pauseEventListenersForTarget, EventDispatcher::resumeEventListenersForTarget)</p>
+</blockquote>
+<h4 id="EventDispatcher_3A_3AresumeEventListenersForTarget"><a href="#EventDispatcher_3A_3AresumeEventListenersForTarget" class="headerlink" title="EventDispatcher::resumeEventListenersForTarget"></a>EventDispatcher::resumeEventListenersForTarget</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> EventDispatcher::resumeEventListenersForTarget(Node* target, <span class="keyword">bool</span> recursive<span class="comment">/* = false */</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">auto</span> listenerIter = _nodeListenersMap.find(target);</span><br><span class="line">    <span class="keyword">if</span> (listenerIter != _nodeListenersMap.end())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">auto</span> listeners = listenerIter-&gt;second;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; l : *listeners) l-&gt;setPaused(<span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这也是个递归调用，基本上就是把Node加入_dirtyNodes中 */</span></span><br><span class="line">    setDirtyForNode(target);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这边是一个递归调用 */</span></span><br><span class="line">    <span class="keyword">if</span> (recursive)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">auto</span>&amp; children = target-&gt;getChildren();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; child : children) resumeEventListenersForTarget(child, <span class="literal">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="u4E8B_u4EF6_u5206_u53D1"><a href="#u4E8B_u4EF6_u5206_u53D1" class="headerlink" title="事件分发"></a>事件分发</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> EventDispatcher::dispatchEvent(Event* event)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!_isEnabled) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这里主要是遍历_dirtyNodes */</span></span><br><span class="line">    <span class="comment">/* 根据_dirtyNodes去更新Node*节点的DirtyFlag */</span></span><br><span class="line">    updateDirtyFlagForSceneGraph();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 增加_inDispatch的计数 */</span></span><br><span class="line">    <span class="comment">/* 当这个分发函数执行完毕的时候，会调用析构函数减少_inDispatch的计数 */</span></span><br><span class="line">    <span class="function">DispatchGuard <span class="title">guard</span><span class="params">(_inDispatch)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 单独将触摸事件独立处理 */</span></span><br><span class="line">    <span class="keyword">if</span> (event-&gt;getType() == Event::Type::TOUCH)</span><br><span class="line">    &#123;</span><br><span class="line">        dispatchTouchEvent(<span class="keyword">static_cast</span>&lt;EventTouch*&gt;(event));</span><br><span class="line">        <span class="comment">/* 在这个函数结束调用之后，栈对象guard会调用析构函数 */</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 获得事件类型 */</span></span><br><span class="line">    <span class="keyword">auto</span> listenerID = __getListenerID(event);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 对监听器进行排序 */</span></span><br><span class="line">    <span class="comment">/* 会对_fixedListeners或_sceneGraphListeners进行排序 */</span></span><br><span class="line">    sortEventListeners(listenerID);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> iter = _listenerMap.find(listenerID);</span><br><span class="line">    <span class="keyword">if</span> (iter != _listenerMap.end())</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">auto</span> listeners = iter-&gt;second;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">auto</span> onEvent = [&amp;event](EventListener* listener) -&gt; <span class="keyword">bool</span>&#123;</span><br><span class="line">            event-&gt;setCurrentTarget(listener-&gt;getAssociatedNode());</span><br><span class="line">            listener-&gt;_onEvent(event);</span><br><span class="line">            <span class="keyword">return</span> event-&gt;isStopped();</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 将事件分发给监听器 */</span></span><br><span class="line">        dispatchEventToListeners(listeners, onEvent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 更新监听器列表 */</span></span><br><span class="line">    <span class="comment">/* 在这个函数中会检查_inDispatch的值 */</span></span><br><span class="line">    <span class="comment">/* 根据_inDispatch的值，会对_toAddedListeners进行操作 */</span></span><br><span class="line">    updateListeners(event);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 在这个函数结束调用之后，栈对象guard会调用析构函数 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="u5206_u53D1_u89E6_u6478_u4E8B_u4EF6"><a href="#u5206_u53D1_u89E6_u6478_u4E8B_u4EF6" class="headerlink" title="分发触摸事件"></a>分发触摸事件</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> EventDispatcher::dispatchTouchEvent(EventTouch* event)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* 先是排序 */</span></span><br><span class="line">    <span class="comment">/* 这里的排序是根据_priorityDirtyFlagMap中查询到的DirtyFlag进行相应排序 */</span></span><br><span class="line">    <span class="comment">/* 若是根据显示顺序的监听器的话，通过visitTarget重新获取_nodePriorityMap*/</span></span><br><span class="line">    <span class="comment">/* 若是根据全局优先级的监听器的话，则只需要根据优先级进行排序即可 */</span></span><br><span class="line">    sortEventListeners(EventListenerTouchOneByOne::LISTENER_ID);</span><br><span class="line">    sortEventListeners(EventListenerTouchAllAtOnce::LISTENER_ID);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">auto</span> oneByOneListeners = getListeners(EventListenerTouchOneByOne::LISTENER_ID);</span><br><span class="line">    <span class="keyword">auto</span> allAtOnceListeners = getListeners(EventListenerTouchAllAtOnce::LISTENER_ID);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">nullptr</span> == oneByOneListeners &amp;&amp; <span class="literal">nullptr</span> == allAtOnceListeners) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">bool</span> isNeedsMutableSet = (oneByOneListeners &amp;&amp; allAtOnceListeners);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Touch*&gt;&amp; originalTouches = event-&gt;getTouches();</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;Touch*&gt; mutableTouches(originalTouches.size());</span><br><span class="line">    <span class="built_in">std</span>::copy(originalTouches.begin(), originalTouches.end(), mutableTouches.begin());</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 先处理单点触控 */</span></span><br><span class="line">    <span class="keyword">if</span> (oneByOneListeners)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">auto</span> mutableTouchesIter = mutableTouches.begin();</span><br><span class="line">        <span class="keyword">auto</span> touchesIter = originalTouches.begin();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (; touchesIter != originalTouches.end(); ++touchesIter)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">bool</span> isSwallowed = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* 给该监听器分发一个单点触控事件 */</span></span><br><span class="line">            <span class="comment">/* 改lambda表达式可能对isSwallowed进行修改 */</span></span><br><span class="line">            <span class="comment">/* 若是开启了吞噬，则会在调用过程中将这个吞噬掉的touch从mutableTouches中移除 */</span></span><br><span class="line">            <span class="keyword">auto</span> onTouchEvent = [&amp;](EventListener* l) -&gt; <span class="keyword">bool</span> &#123; ... &#125;;</span><br><span class="line"></span><br><span class="line">            dispatchEventToListeners(oneByOneListeners, onTouchEvent);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (event-&gt;isStopped()) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">/* 若没有设置触摸 */</span></span><br><span class="line">            <span class="comment">/* 则该事件继续像originalTouches中的监听器分发 */</span></span><br><span class="line">            <span class="keyword">if</span> (!isSwallowed) ++mutableTouchesIter;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 多点触摸 */</span></span><br><span class="line">    <span class="keyword">if</span> (allAtOnceListeners &amp;&amp; mutableTouches.size() &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">auto</span> onTouchesEvent = [&amp;](EventListener* l) -&gt; <span class="keyword">bool</span> &#123; ... &#125;;</span><br><span class="line"></span><br><span class="line">        dispatchEventToListeners(allAtOnceListeners, onTouchesEvent);</span><br><span class="line">        <span class="keyword">if</span> (event-&gt;isStopped()) <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    updateListeners(event);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+	  
+
+	  <div>
+  		<center>
+		  <div class="pagination">
+<ul class="pagination">
+	
+	
+	
+	
+	
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+			
+		
+	
+		
+	
+		
+	
+		
+	
+		
+			
+			
+			
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+			
+		
+	
+		
+	
+		
+			
+		
+	
+		
+	
+	
+	
+		<li class="prev"><a href="/2015/03/11/cocos-ccglprogram/" class="alignleft prev"><i class="fa fa-arrow-circle-o-left"></i>prev</a></li>
+	
+	<li><a href="/"><i class="fa fa-archive"></i>Home</a></li>
+	
+		<li class="next"><a href="/2014/12/18/cocos-ccactioninterval/" class="alignright next">next<i class="fa fa-arrow-circle-o-right"></i></a></li>
+	
+</ul>
+</div>
+
+		</center>
+	  </div>
+	  
+	</div> <!-- col-md-9/col-md-12 -->
+	
+  </div><!-- row -->
+
+	</div>
+  </div>
+  <div class="container-narrow">
+	<footer> <p>
+  &copy; 2016 John Doe
+  
+      with help from <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a> and <a href="http://getbootstrap.com/" target="_blank">Twitter Bootstrap</a>. Theme by <a href="http://github.com/wzpan/hexo-theme-wixo/">Wixo</a>.    
+</p> </footer>
+  </div> <!-- container-narrow -->
+  
+<a id="gotop" href="#">   
+  <span>▲</span> 
+</a>
+
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.tableofcontents.min.js"></script>
+<script src="/js/tocgenerator.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+
+</body>
+</html>
